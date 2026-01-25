@@ -1,0 +1,49 @@
+services:
+  db:
+    image: "postgres:17.4"
+    restart: "on-failure:3"
+    environment:
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - "${VOLUME_DIR}/data/postgres:/var/lib/postgresql/data"
+    ports:
+      - "127.0.0.1:${DB_EXTERNAL_PORT}:5432"
+
+  backend:
+    # For local development, we build from source:
+    build: "./backend"
+    # For production (CI/CD), comment out 'build' and uncomment 'image':
+    # image: ghcr.io/YOUR_GITHUB_USERNAME/todo-template-backend:latest
+    depends_on:
+      - "db"
+    restart: "on-failure:3"
+    environment:
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/${DB_NAME}"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+    ports:
+      - "${BACKEND_EXTERNAL_PORT}:8080"
+
+  frontend:
+    # For local development:
+    build: "./frontend"
+    # For production (CI/CD):
+    # image: ghcr.io/YOUR_GITHUB_USERNAME/todo-template-frontend:latest
+    depends_on:
+      - "backend"
+    restart: "on-failure:3"
+    environment:
+      BACKEND_EXTERNAL_URL: "${BACKEND_EXTERNAL_URL}"
+    ports:
+      - "${FRONTEND_EXTERNAL_PORT}:80"
+
+  adminer:
+    image: "adminer:5.0.4"
+    depends_on:
+      - "db"
+    restart: "on-failure:3"
+    ports:
+      - "${ADMINER_EXTERNAL_PORT}:8080"
