@@ -11,6 +11,12 @@
   /* Sensible default breadth */
   border: 1px solid var(--border-color);
   margin-top: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Ensure centering in the CommonLayout body */
