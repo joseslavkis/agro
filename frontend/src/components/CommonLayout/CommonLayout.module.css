@@ -57,3 +57,27 @@
   margin: 0 auto;
   box-sizing: border-box;
 }
+
+@media (max-width: 768px) {
+  .topBar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .navLinks {
+    flex-direction: column;
+    /* Or row if few items */
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .navLinks li {
+    margin-left: 0;
+  }
+
+  .body {
+    padding: 1rem;
+  }
+}
