@@ -5,6 +5,9 @@ import styles from "./WelcomeScreen.module.css";
 export const WelcomeScreen = () => {
     return (
         <div className={styles.container}>
+            <video autoPlay loop muted playsInline className={styles.backgroundVideo}>
+                <source src="/background.mp4" type="video/mp4" />
+            </video>
             <div className={styles.overlay} />
             <img src={logo} alt="Logo" className={styles.logo} />
             <div className={styles.content}>
