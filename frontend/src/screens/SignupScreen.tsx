@@ -16,9 +16,9 @@ export const SignupScreen = () => {
       gender: "Other",
     },
     validators: {
-      onChange: SignupRequestSchema,
+      onChange: SignupRequestSchema as any,
     },
-    onSubmit: async ({ value }) => mutate(value),
+    onSubmit: async ({ value }) => mutate(value as unknown as any),
   });
 
   return (
