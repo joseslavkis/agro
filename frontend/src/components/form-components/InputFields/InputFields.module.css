@@ -1,11 +1,35 @@
-.input {
-  margin-left: 1rem;
+.fieldWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
 }
 
 .dataContainer {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
