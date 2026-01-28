@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 public class User implements UserDetails, UserCredentials {
 
     @Id
@@ -34,11 +35,14 @@ public class User implements UserDetails, UserCredentials {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false) // user name in the platform, distinct from email
+    private String username;
+
     @Column(nullable = false)
     private LocalDate birthDate;
 
     public User(String name, String password, String gender, String email, String lastname, String photo,
-            LocalDate birthDate) {
+            LocalDate birthDate, String username) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
@@ -46,6 +50,7 @@ public class User implements UserDetails, UserCredentials {
         this.birthDate = birthDate;
         this.password = password;
         this.gender = gender;
+        this.username = username;
     }
 
     public User() {
@@ -92,6 +97,14 @@ public class User implements UserDetails, UserCredentials {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public String getAppUsername() {
+        return username;
+    }
+
+    public void setAppUsername(String username) {
+        this.username = username;
     }
 
     @Override

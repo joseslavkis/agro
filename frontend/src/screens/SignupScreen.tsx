@@ -11,6 +11,7 @@ export const SignupScreen = () => {
   const formData = useAppForm({
     defaultValues: {
       email: "",
+      username: "",
       password: "",
       name: "",
       lastname: "",
@@ -31,6 +32,7 @@ export const SignupScreen = () => {
           <formData.FormContainer extraError={error}>
             <formData.AppField name="name" children={(field) => <field.TextField label="Nombre" />} />
             <formData.AppField name="lastname" children={(field) => <field.TextField label="Apellido" />} />
+            <formData.AppField name="username" children={(field) => <field.TextField label="Nombre de Usuario" />} />
             <formData.AppField name="email" children={(field) => <field.TextField label="Correo Electrónico" />} />
             <formData.AppField name="password" children={(field) => <field.PasswordField label="Contraseña" />} />
             <formData.AppField name="birthDate" children={(field) => <field.DateField label="Fecha de Nacimiento" />} />

@@ -66,4 +66,23 @@ class UserRestController {
                 return userService.updateUser(userDTO, currentUser.getId());
         }
 
+        @PreAuthorize("isAuthenticated()")
+        @GetMapping(value = "/list", produces = "application/json")
+        @Operation(summary = "List all users")
+        @ResponseStatus(HttpStatus.OK)
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+        public ResponseEntity<java.util.List<UserProfileDTO>> listUsers() {
+                return ResponseEntity.ok(userService.getAllUsers());
+        }
+
+        @PreAuthorize("isAuthenticated()")
+        @GetMapping(value = "/search", produces = "application/json")
+        @Operation(summary = "Search users by username")
+        @ResponseStatus(HttpStatus.OK)
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+        public ResponseEntity<java.util.List<UserProfileDTO>> searchUsers(@RequestParam String query,
+                        @AuthenticationPrincipal(expression = "username") String email) {
+                return ResponseEntity.ok(userService.searchUsers(query, email));
+        }
+
 }

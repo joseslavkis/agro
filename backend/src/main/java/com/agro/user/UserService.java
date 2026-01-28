@@ -26,17 +26,20 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
+    private final com.agro.partners.repository.PartnerRepository partnerRepository;
 
     @Autowired
     UserService(
             JwtService jwtService,
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
-            RefreshTokenService refreshTokenService) {
+            RefreshTokenService refreshTokenService,
+            com.agro.partners.repository.PartnerRepository partnerRepository) {
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
+        this.partnerRepository = partnerRepository;
     }
 
     @Override
@@ -51,6 +54,13 @@ public class UserService implements UserDetailsService {
 
     Optional<TokenDTO> createUser(UserCreateDTO data) {
         if (userRepository.findByEmail(data.email()).isPresent()) {
+            return Optional.empty();
+        }
+        if (userRepository.findByUsername(data.username()).isPresent()) {
+            // For now, if username exists, we fail silently or return empty too.
+            // Ideally we should differentiate error but existing interface returns
+            // Optional<TokenDTO>.
+            // Using runtime exception for now? Or just return empty.
             return Optional.empty();
         } else {
             var user = data.asUser(passwordEncoder::encode);
@@ -81,7 +91,8 @@ public class UserService implements UserDetailsService {
                         user.getLastname(),
                         user.getPhoto(),
                         user.getGender(),
-                        user.getBirthDate()));
+                        user.getBirthDate(),
+                        user.getAppUsername()));
     }
 
     Optional<User> deleteUser(Long id) {
@@ -129,5 +140,36 @@ public class UserService implements UserDetailsService {
                     userRepository.save(findedUser);
                     return ResponseEntity.status(HttpStatus.OK).body(new StatusResponseDTO("success", "User updated"));
                 });
+    }
+
+    public java.util.List<UserProfileDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserProfileDTO(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getLastname(),
+                        user.getPhoto(),
+                        user.getGender(),
+                        user.getBirthDate(),
+                        user.getAppUsername()))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public java.util.List<UserProfileDTO> searchUsers(String query, String email) {
+        User currentUser = getUserByEmail(email);
+        return userRepository.findBySearchTerm(query).stream()
+                .filter(user -> !user.getEmail().equals(email))
+                .filter(user -> partnerRepository.findRequestBetween(currentUser, user).isEmpty())
+                .map(user -> new UserProfileDTO(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getLastname(),
+                        user.getPhoto(),
+                        user.getGender(),
+                        user.getBirthDate(),
+                        user.getAppUsername()))
+                .collect(java.util.stream.Collectors.toList());
     }
 }

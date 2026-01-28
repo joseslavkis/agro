@@ -15,7 +15,7 @@ public record UserCreateDTO(
         String lastname,
         String gender,
         LocalDate birthDate,
-        String role)
+        @NotNull(message = "Username is required") String username)
         implements UserCredentials {
     public User asUser(Function<String, String> encryptPassword) {
         return new User(
@@ -25,6 +25,7 @@ public record UserCreateDTO(
                 email,
                 lastname != null ? lastname : "",
                 photo != null ? photo : "",
-                birthDate != null ? birthDate : LocalDate.of(2000, 1, 1));
+                birthDate != null ? birthDate : LocalDate.of(2000, 1, 1),
+                username);
     }
 }
