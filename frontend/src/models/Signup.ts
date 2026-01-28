@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const SignupRequestSchema = z.object({
     email: z.string().email("Debe ser un email válido"),
+    username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
     password: z.string().min(4, "La contraseña debe tener al menos 4 caracteres"),
     name: z.string().min(1, "El nombre es obligatorio"),
     lastname: z.string().min(1, "El apellido es obligatorio"),

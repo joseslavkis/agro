@@ -47,7 +47,10 @@ const LoggedInLinks = () => {
   return (
     <>
       <li>
-        <Link href="/under-construction">Página Principal</Link>
+        <Link href="/">Mis Campos</Link>
+      </li>
+      <li>
+        <Link href="/partners">Socios</Link>
       </li>
       <li>
         <button onClick={logOut}>Cerrar Sesión</button>
