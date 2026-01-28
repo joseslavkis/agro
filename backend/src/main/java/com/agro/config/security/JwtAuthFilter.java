@@ -20,18 +20,20 @@ import java.util.List;
 class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
 
     @Autowired
-    JwtAuthFilter(JwtService jwtService) {
+    JwtAuthFilter(JwtService jwtService,
+            org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
         this.authenticateToken(request);
         filterChain.doFilter(request, response);
     }
@@ -50,12 +52,15 @@ class JwtAuthFilter extends OncePerRequestFilter {
         }
         String token = authHeader.substring(headerPrefix.length());
 
-        jwtService.extractVerifiedUserDetails(token).ifPresent(userDetails -> {
+        jwtService.extractVerifiedUserDetails(token).ifPresent(jwtInfo -> {
+            // Load the full User entity from DB
+            org.springframework.security.core.userdetails.UserDetails userDetails = userDetailsService
+                    .loadUserByUsername(jwtInfo.username());
+
             var authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,
-                    List.of(new SimpleGrantedAuthority(userDetails.role()))
-            );
+                    userDetails.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         });

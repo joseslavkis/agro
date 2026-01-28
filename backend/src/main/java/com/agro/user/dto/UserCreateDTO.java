@@ -25,7 +25,6 @@ public record UserCreateDTO(
                 email,
                 lastname != null ? lastname : "",
                 photo != null ? photo : "",
-                role != null ? role : "USER",
                 birthDate != null ? birthDate : LocalDate.of(2000, 1, 1));
     }
 }

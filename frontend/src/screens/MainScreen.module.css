@@ -1,0 +1,369 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 80vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 3rem;
+    width: 100%;
+    padding-bottom: 3rem;
+}
+
+/* Blue/Cyan Palette updates */
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #e0f2fe 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+    letter-spacing: -0.5px;
+}
+
+.card {
+    background: rgba(10, 15, 30, 0.75);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    overflow: hidden;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    /* Blue border hint */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+    border-color: rgba(59, 130, 246, 0.6);
+}
+
+.cardImageWrapper {
+    height: 60%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card:hover .cardImage {
+    transform: scale(1.1);
+}
+
+.cardContent {
+    height: 40%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(to bottom, #0f172a, #0b1120);
+    /* Deep blue-black */
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.cardTitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cardSubtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #93c5fd;
+    /* Lighter Blue text for better contrast */
+    font-family: monospace;
+    font-weight: 500;
+}
+
+.addButton {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.addButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modalContent {
+    background: #0f172a;
+    /* Dark blue-black */
+    padding: 3rem;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 600px;
+    /* Increased max-width */
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.9);
+    position: relative;
+    overflow: hidden;
+    /* Ensure it doesn't get squashed */
+    margin: 2rem;
+}
+
+.modalContent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.h2 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.inputGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.input {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* Dark background */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    /* Important for padding */
+}
+
+.input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.modalActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+.cancelButton {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    padding: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+    width: 100%;
+    font-size: 1rem;
+}
+
+.cancelButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: white;
+    color: white;
+}
+
+.submitButton {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    font-size: 1rem;
+}
+
+.submitButton:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.submitButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.emptyState {
+    text-align: center;
+    color: #aaa;
+    grid-column: 1 / -1;
+    padding: 4rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* File Upload Styling */
+.fileUploadContainer {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.fileDropZone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px dashed rgba(59, 130, 246, 0.4);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    color: #cbd5e1;
+}
+
+.fileDropZone:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.fileDropZone.active {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+}
+
+.hiddenInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.uploadIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #3b82f6;
+}
+
+.selectedFile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.removeFile {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    border-radius: 50%;
+    transition: background 0.2s;
+    width: auto;
+    box-shadow: none;
+}
+
+.removeFile:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
