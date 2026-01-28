@@ -6,6 +6,8 @@ import { SignupScreen } from "@/screens/SignupScreen";
 import { WelcomeScreen } from "@/screens/WelcomeScreen";
 import { useToken } from "@/services/TokenContext";
 
+import { PartnersScreen } from "@/screens/PartnersScreen";
+
 export const Navigation = () => {
   const [tokenState] = useToken();
   switch (tokenState.state) {
@@ -14,6 +16,9 @@ export const Navigation = () => {
         <Switch>
           <Route path="/">
             <MainScreen />
+          </Route>
+          <Route path="/partners">
+            <PartnersScreen />
           </Route>
           <Route>
             <Redirect href="/" />
