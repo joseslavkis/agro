@@ -44,4 +44,21 @@ public class FieldController {
             throw new RuntimeException("Error creating field: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteField(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        try {
+            System.out.println("Received delete request for field ID: " + id);
+            if (user == null) {
+                System.out.println("User is null during delete request!");
+                return ResponseEntity.status(401).build();
+            }
+            fieldService.deleteField(user.getId(), id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            System.out.println("Error deleting field: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
 }
