@@ -113,22 +113,36 @@
   .topBar {
     flex-direction: column;
     padding: 1rem;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .navLinks {
-    flex-direction: column;
-    /* Or row if few items */
+    flex-direction: row;
+    /* Keep row for links on mobile if they fit, or wrap */
+    flex-wrap: wrap;
     gap: 1rem;
     width: 100%;
     justify-content: center;
+    margin-top: 0.5rem;
   }
 
   .navLinks li {
     margin-left: 0;
   }
 
+  .topBar a {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+
   .body {
     padding: 1rem;
+    width: 100%;
+  }
+
+  .logo {
+    height: 60px;
+    /* Smaller logo on mobile */
+    padding: 8px 12px;
   }
 }

@@ -13,6 +13,15 @@
     margin: 0 auto;
 }
 
+@media (max-width: 480px) {
+    .authContainer {
+        padding: 2rem 1.5rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 1rem;
+    }
+}
+
 .authContainer::before {
     content: '';
     position: absolute;

@@ -1,19 +1,27 @@
 :root {
   /* Professional Blue Theme Palette */
-  --primary-color: #0056b3; /* Deep Professional Blue */
+  --primary-color: #0056b3;
+  /* Deep Professional Blue */
   --primary-hover: #004494;
   --secondary-color: #ffffff;
   --text-main: #333333;
   --text-muted: #666666;
-  --background-light: #f4f6f8; /* Soft Gray-Blueish White */
+  --background-light: #f4f6f8;
+  /* Soft Gray-Blueish White */
   --border-color: #e1e4e8;
   --error-color: #dc3545;
   --success-color: #28a745;
-  
+
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   --radius: 8px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -31,7 +39,9 @@ body {
   flex-direction: column;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: var(--primary-color);
   margin-bottom: 0.5em;
   font-weight: 600;
