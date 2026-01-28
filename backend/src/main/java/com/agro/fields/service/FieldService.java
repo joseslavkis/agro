@@ -60,6 +60,18 @@ public class FieldService {
         return mapToDTO(savedField);
     }
 
+    @Transactional
+    public void deleteField(Long userId, Long fieldId) {
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found"));
+
+        if (!field.getUser().getId().equals(userId)) {
+            throw new RuntimeException("You are not authorized to delete this field");
+        }
+
+        fieldRepository.delete(field);
+    }
+
     private String saveImage(org.springframework.web.multipart.MultipartFile image) {
         try {
             String uploadDir = "uploads/";
