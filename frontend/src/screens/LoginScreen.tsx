@@ -19,11 +19,11 @@ export const LoginScreen = () => {
 
   return (
     <CommonLayout>
-      <h1>Log In</h1>
+      <h1 style={{ color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)', marginBottom: '1.5rem', textAlign: 'center' }}>Iniciar Sesión</h1>
       <formData.AppForm>
         <formData.FormContainer extraError={error}>
-          <formData.AppField name="email" children={(field) => <field.TextField label="Email" />} />
-          <formData.AppField name="password" children={(field) => <field.PasswordField label="Password" />} />
+          <formData.AppField name="email" children={(field) => <field.TextField label="Correo Electrónico" />} />
+          <formData.AppField name="password" children={(field) => <field.PasswordField label="Contraseña" />} />
         </formData.FormContainer>
       </formData.AppForm>
     </CommonLayout>

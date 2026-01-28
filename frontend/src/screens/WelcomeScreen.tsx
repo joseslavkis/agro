@@ -11,12 +11,12 @@ export const WelcomeScreen = () => {
             <div className={styles.overlay} />
             <img src={logo} alt="Logo" className={styles.logo} />
             <div className={styles.content}>
-                <h1 className={styles.title}>Welcome to Agro</h1>
+                <h1 className={styles.title}>Bienvenido a Agro</h1>
                 <Link href="/login" className={styles.buttonLink}>
-                    <button className={`${styles.button} ${styles.primaryBtn}`}>Log In</button>
+                    <button className={`${styles.button} ${styles.primaryBtn}`}>Iniciar Sesión</button>
                 </Link>
                 <Link href="/signup" className={styles.buttonLink}>
-                    <button className={`${styles.button} ${styles.secondaryBtn}`}>Sign Up</button>
+                    <button className={`${styles.button} ${styles.secondaryBtn}`}>Registrarse</button>
                 </Link>
             </div>
         </div>
