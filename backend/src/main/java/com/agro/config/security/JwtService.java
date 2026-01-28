@@ -21,22 +21,16 @@ public class JwtService {
     @Autowired
     public JwtService(
             @Value("${jwt.access.secret}") String secret,
-            @Value("${jwt.access.expiration}") Long expiration
-    ) {
+            @Value("${jwt.access.expiration}") Long expiration) {
         this.secret = secret;
         this.expiration = expiration;
     }
 
     public String createToken(JwtUserDetails claims) {
-        String role = claims.role().startsWith("ROLE_")
-                ? claims.role()
-                : "ROLE_" + claims.role();
-
         return Jwts.builder()
                 .subject(claims.username())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .claim("role", role)
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -49,8 +43,8 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            if (claims.getSubject() != null && claims.get("role") instanceof String role) {
-                return Optional.of(new JwtUserDetails(claims.getSubject(), role));
+            if (claims.getSubject() != null) {
+                return Optional.of(new JwtUserDetails(claims.getSubject()));
             }
         } catch (Exception e) {
             // TODO: Tenemos que handlear el error

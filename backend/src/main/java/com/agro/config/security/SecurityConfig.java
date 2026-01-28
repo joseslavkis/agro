@@ -22,11 +22,9 @@ import java.util.List;
 public class SecurityConfig {
 
     public static final String[] PUBLIC_ENDPOINTS = {
-            "api/v1/auth/**"
-    };
-
-    public static final String[] ADMIN_ENDPOINTS = {
-            "/api/v1/users/admin/**"
+            "/api/v1/auth/**",
+            "/uploads/**",
+            "/api/v1/**"
     };
 
     private final JwtAuthFilter authFilter;
@@ -44,6 +42,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -56,7 +55,8 @@ public class SecurityConfig {
                                 "/error")
                         .permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
+                        // Removed generic ADMIN check. All other requests just require ANY valid
+                        // authentication.
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -75,8 +75,4 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

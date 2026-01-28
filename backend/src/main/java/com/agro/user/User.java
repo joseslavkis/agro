@@ -37,10 +37,7 @@ public class User implements UserDetails, UserCredentials {
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Column(nullable = false)
-    private String role;
-
-    public User(String name, String password, String gender, String email, String lastname, String photo, String role,
+    public User(String name, String password, String gender, String email, String lastname, String photo,
             LocalDate birthDate) {
         this.name = name;
         this.lastname = lastname;
@@ -49,7 +46,6 @@ public class User implements UserDetails, UserCredentials {
         this.birthDate = birthDate;
         this.password = password;
         this.gender = gender;
-        this.role = role;
     }
 
     public User() {
@@ -123,13 +119,15 @@ public class User implements UserDetails, UserCredentials {
         return id;
     }
 
-    public String getRole() {
-        return role;
-    }
+    // Role getters removed
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        // Return empty authorities or a default one if Spring Security complains about
+        // empty authorities (it usually doesn't for basic auth, but sometimes
+        // anonymous)
+        // Actually, returning an empty list is fine for "no specific roles".
+        return List.of();
     }
 
     @Override
