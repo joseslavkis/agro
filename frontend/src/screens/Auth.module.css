@@ -1,0 +1,46 @@
+.authContainer {
+    background: rgba(15, 23, 42, 0.85);
+    /* Dark blue-black */
+    backdrop-filter: blur(20px);
+    padding: 3rem;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.authContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.title {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* We need to override some of the AppForm default styles if they are generic, 
+   but since AppForm uses components, we might be somewhat limited unless we adjust 
+   global CSS or pass classes. For now, we wrap the form in this container. */
+
+.submitButtonWrapper {
+    margin-top: 2rem;
+}
+
+/* To ensure inputs look good if we can target them, or just rely on the container vibe */

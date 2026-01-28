@@ -95,46 +95,13 @@ public class UserService implements UserDetailsService {
 
     private TokenDTO generateTokens(User user) {
         String accessToken = jwtService.createToken(new JwtUserDetails(
-                user.getUsername(),
-                user.getRole()));
+                user.getUsername()));
         RefreshToken refreshToken = refreshTokenService.createFor(user);
         return new TokenDTO(accessToken, refreshToken.value());
     }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    }
-
-    public Optional<ResponseEntity<StatusResponseDTO>> updateAdmin(Long id, UserUpdateDTO userDTO) {
-        return userRepository.findById(id)
-                .map(findedUser -> {
-                    if (!"ADMIN".equals(findedUser.getRole())) {
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                                .body(new StatusResponseDTO("error", "User not found"));
-                    }
-
-                    if (userDTO.name() != null) {
-                        findedUser.setName(userDTO.name());
-                    }
-                    if (userDTO.lastname() != null) {
-                        findedUser.setLastname(userDTO.lastname());
-                    }
-                    if (userDTO.gender() != null) {
-                        findedUser.setGender(userDTO.gender());
-                    }
-                    if (userDTO.photo() != null) {
-                        findedUser.setPhoto(userDTO.photo());
-                    }
-                    if (userDTO.birthDate() != null) {
-                        findedUser.setBirthDate(userDTO.birthDate());
-                    }
-                    if (userDTO.password() != null) {
-                        findedUser.setPassword(userDTO.password());
-                    }
-
-                    userRepository.save(findedUser);
-                    return ResponseEntity.status(HttpStatus.OK).body(new StatusResponseDTO("success", "Admin updated"));
-                });
     }
 
     public Optional<ResponseEntity<StatusResponseDTO>> updateUser(UserUpdateDTO userDTO, Long id) {
