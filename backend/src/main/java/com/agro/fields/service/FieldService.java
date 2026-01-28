@@ -43,7 +43,7 @@ public class FieldService {
             org.springframework.web.multipart.MultipartFile image) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         String photo = null;
         if (image != null && !image.isEmpty()) {
             photo = saveImage(image);

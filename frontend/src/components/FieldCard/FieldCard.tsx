@@ -1,7 +1,6 @@
 
 import styles from "./FieldCard.module.css";
 import { Field } from "@/models/Field";
-import { getFieldPhotoUrl } from "@/utils/field-photos";
 import React, { useMemo } from "react";
 
 interface FieldCardProps {
