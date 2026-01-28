@@ -2,6 +2,29 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.backgroundVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 30, 60, 0.4));
+  z-index: 1;
 }
 
 .topBar {
@@ -10,15 +33,31 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 2rem;
-  background-color: var(--secondary-color);
-  box-shadow: var(--shadow-sm);
+  background-color: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
   margin: 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none;
+  z-index: 10;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .logo {
-  height: 110px;
+  height: 90px;
   width: auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 12px 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+  /* Ensure it looks like the chip */
+  display: block;
+}
+
+.logo:hover {
+  transform: scale(1.02);
 }
 
 .navLinks {
@@ -35,13 +74,23 @@
 }
 
 .topBar a {
-  color: var(--text-muted);
-  font-weight: 500;
+  color: var(--primary-color);
+  background-color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
   font-size: 0.95rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .topBar a:hover {
-  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #f8fbff;
+  color: var(--primary-hover);
   text-decoration: none;
 }
 
@@ -56,6 +105,8 @@
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
+  z-index: 2;
+  position: relative;
 }
 
 @media (max-width: 768px) {

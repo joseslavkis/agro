@@ -23,18 +23,18 @@ export const SignupScreen = () => {
 
   return (
     <CommonLayout>
-      <h1>Sign Up</h1>
+      <h1 style={{ color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)', marginBottom: '1.5rem', textAlign: 'center' }}>Registrarse</h1>
       <formData.AppForm>
         <formData.FormContainer extraError={error}>
-          <formData.AppField name="name" children={(field) => <field.TextField label="Name" />} />
-          <formData.AppField name="lastname" children={(field) => <field.TextField label="Last Name" />} />
-          <formData.AppField name="email" children={(field) => <field.TextField label="Email" />} />
-          <formData.AppField name="password" children={(field) => <field.PasswordField label="Password" />} />
-          <formData.AppField name="birthDate" children={(field) => <field.DateField label="Date of Birth" />} />
-          <formData.AppField name="gender" children={(field) => <field.SelectField label="Gender" options={[
-            { value: 'Male', label: 'Male' },
-            { value: 'Female', label: 'Female' },
-            { value: 'Other', label: 'Other' }
+          <formData.AppField name="name" children={(field) => <field.TextField label="Nombre" />} />
+          <formData.AppField name="lastname" children={(field) => <field.TextField label="Apellido" />} />
+          <formData.AppField name="email" children={(field) => <field.TextField label="Correo Electrónico" />} />
+          <formData.AppField name="password" children={(field) => <field.PasswordField label="Contraseña" />} />
+          <formData.AppField name="birthDate" children={(field) => <field.DateField label="Fecha de Nacimiento" />} />
+          <formData.AppField name="gender" children={(field) => <field.SelectField label="Género" options={[
+            { value: 'Male', label: 'Masculino' },
+            { value: 'Female', label: 'Femenino' },
+            { value: 'Other', label: 'Otro' }
           ]} />} />
         </formData.FormContainer>
       </formData.AppForm>

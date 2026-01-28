@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const SignupRequestSchema = z.object({
-    email: z.string().email("Must be a valid email"),
-    password: z.string().min(4, "Password must be at least 4 characters"),
-    name: z.string().min(1, "Name is required"),
-    lastname: z.string().min(1, "Last name is required"),
+    email: z.string().email("Debe ser un email válido"),
+    password: z.string().min(4, "La contraseña debe tener al menos 4 caracteres"),
+    name: z.string().min(1, "El nombre es obligatorio"),
+    lastname: z.string().min(1, "El apellido es obligatorio"),
     birthDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
-        message: "Invalid date format",
+        message: "Formato de fecha inválido",
     }),
     gender: z.enum(["Male", "Female", "Other"]).default("Other"),
     photo: z.string().optional(),

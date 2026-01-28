@@ -10,7 +10,7 @@ export const SubmitButton = () => {
       selector={(state) => [state.canSubmit, state.isSubmitting]}
       children={([canSubmit, isSubmitting]) => (
         <button type="submit" className={styles.button} disabled={!canSubmit}>
-          {isSubmitting ? "..." : "Submit"}
+          {isSubmitting ? "..." : "Enviar"}
         </button>
       )}
     />

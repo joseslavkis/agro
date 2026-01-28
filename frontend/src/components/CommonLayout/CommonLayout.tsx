@@ -11,6 +11,10 @@ export const CommonLayout = ({ children }: React.PropsWithChildren) => {
 
   return (
     <div className={styles.mainLayout}>
+      <video autoPlay loop muted playsInline className={styles.backgroundVideo}>
+        <source src="/background.mp4" type="video/mp4" />
+      </video>
+      <div className={styles.overlay} />
       <nav className={styles.topBar}>
         <img src={logo} alt="Agro Logo" className={styles.logo} />
         <ul className={styles.navLinks}>{tokenState.state === "LOGGED_OUT" ? <LoggedOutLinks /> : <LoggedInLinks />}</ul>
@@ -24,10 +28,10 @@ const LoggedOutLinks = () => {
   return (
     <>
       <li>
-        <Link href="/login">Log in</Link>
+        <Link href="/login">Iniciar Sesión</Link>
       </li>
       <li>
-        <Link href="/signup">Sign Up</Link>
+        <Link href="/signup">Registrarse</Link>
       </li>
     </>
   );
@@ -43,10 +47,10 @@ const LoggedInLinks = () => {
   return (
     <>
       <li>
-        <Link href="/under-construction">Main Page</Link>
+        <Link href="/under-construction">Página Principal</Link>
       </li>
       <li>
-        <button onClick={logOut}>Log out</button>
+        <button onClick={logOut}>Cerrar Sesión</button>
       </li>
     </>
   );
