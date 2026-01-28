@@ -15,11 +15,13 @@ export function useLogin() {
   });
 }
 
+import { SignupRequest } from "@/models/Signup";
+
 export function useSignup() {
   const [, setToken] = useToken();
 
   return useMutation({
-    mutationFn: async (req: LoginRequest) => {
+    mutationFn: async (req: SignupRequest) => {
       const tokenData = await auth("/api/v1/auth/signup", req);
       setToken({ state: "LOGGED_IN", ...tokenData });
     },
@@ -38,6 +40,8 @@ async function auth(endpoint: string, data: LoginRequest) {
 
   if (response.ok) {
     return LoginResponseSchema.parse(await response.json());
+  } else if (response.status === 409) {
+    throw new Error("Email already registered");
   } else {
     throw new Error(`Failed with status ${response.status}: ${await response.text()}`);
   }
