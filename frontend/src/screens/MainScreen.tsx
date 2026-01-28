@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
-import { useMyFields, useCreateField } from "@/services/FieldServices";
+import { useMyFields, useCreateField, useDeleteField } from "@/services/FieldServices";
 import { getFieldPhotoUrl } from "@/utils/field-photos";
 import styles from "./MainScreen.module.css";
 
 export const MainScreen = () => {
   const { data: fields, isLoading } = useMyFields();
   const { mutateAsync: createField, isPending: isCreating } = useCreateField();
+  const { mutateAsync: deleteField, isPending: isDeleting } = useDeleteField();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmationId, setDeleteConfirmationId] = useState<number | null>(null);
   const [formData, setFormData] = useState<{
     name: string;
     hectares: string;
@@ -30,6 +32,26 @@ export const MainScreen = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setDeleteConfirmationId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmationId === null) return;
+    try {
+      await deleteField(deleteConfirmationId);
+      setDeleteConfirmationId(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error al eliminar el campo");
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmationId(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +120,13 @@ export const MainScreen = () => {
                     <span>{field.hectares} Hectáreas</span>
                   </div>
                 </div>
+                <button
+                  className={styles.cardDeleteButton}
+                  onClick={(e) => handleDeleteClick(e, field.id)}
+                  title="Eliminar campo"
+                >
+                  🗑️
+                </button>
               </div>
             ))
           ) : (
@@ -205,7 +234,36 @@ export const MainScreen = () => {
             </div>
           </div>
         )}
+
+        {deleteConfirmationId !== null && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+              <h2 className={styles.h2} style={{ marginBottom: '1rem' }}>¿Eliminar campo?</h2>
+              <p style={{ color: '#cbd5e1', marginBottom: '2rem' }}>
+                ¿Estás seguro de que deseas eliminar este campo? Esta acción no se puede deshacer.
+              </p>
+              <div className={styles.modalActions}>
+                <button
+                  className={styles.cancelButton}
+                  onClick={handleCancelDelete}
+                  disabled={isDeleting}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className={styles.submitButton}
+                  style={{ background: '#ef4444' }}
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Eliminando..." : "Eliminar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </CommonLayout>
+    </CommonLayout >
   );
 };

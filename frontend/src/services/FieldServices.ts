@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BASE_API_URL } from "@/config/app-query-client";
 import { useToken } from "@/services/TokenContext";
-import { CreateFieldRequest, Field, FieldSchema } from "@/models/Field";
+import { CreateFieldRequest, FieldSchema } from "@/models/Field";
 import { z } from "zod";
 
 export function useMyFields() {
@@ -64,6 +64,33 @@ export function useCreateField() {
             }
 
             return FieldSchema.parse(await response.json());
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["fields"] });
+        },
+    });
+}
+
+export function useDeleteField() {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (fieldId: number) => {
+            if (!token) throw new Error("Not logged in");
+
+            const response = await fetch(`${BASE_API_URL}/api/v1/fields/${fieldId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Error deleting field: ${response.status} ${text}`);
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["fields"] });
