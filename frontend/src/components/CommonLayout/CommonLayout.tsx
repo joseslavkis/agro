@@ -3,6 +3,7 @@ import { Link } from "wouter";
 
 import { useToken } from "@/services/TokenContext";
 
+import logo from "@/assets/logo.jpg";
 import styles from "./CommonLayout.module.css";
 
 export const CommonLayout = ({ children }: React.PropsWithChildren) => {
@@ -10,7 +11,10 @@ export const CommonLayout = ({ children }: React.PropsWithChildren) => {
 
   return (
     <div className={styles.mainLayout}>
-      <ul className={styles.topBar}>{tokenState.state === "LOGGED_OUT" ? <LoggedOutLinks /> : <LoggedInLinks />}</ul>
+      <nav className={styles.topBar}>
+        <img src={logo} alt="Agro Logo" className={styles.logo} />
+        <ul className={styles.navLinks}>{tokenState.state === "LOGGED_OUT" ? <LoggedOutLinks /> : <LoggedInLinks />}</ul>
+      </nav>
       <div className={styles.body}>{children}</div>
     </div>
   );
@@ -41,8 +45,6 @@ const LoggedInLinks = () => {
       <li>
         <Link href="/under-construction">Main Page</Link>
       </li>
-      <li>Projects</li>
-      <li>Tasks</li>
       <li>
         <button onClick={logOut}>Log out</button>
       </li>

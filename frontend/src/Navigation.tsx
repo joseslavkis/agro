@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from "wouter";
 import { LoginScreen } from "@/screens/LoginScreen";
 import { MainScreen } from "@/screens/MainScreen";
 import { SignupScreen } from "@/screens/SignupScreen";
+import { WelcomeScreen } from "@/screens/WelcomeScreen";
 import { useToken } from "@/services/TokenContext";
 
 export const Navigation = () => {
@@ -22,6 +23,9 @@ export const Navigation = () => {
     case "LOGGED_OUT":
       return (
         <Switch>
+          <Route path="/">
+            <WelcomeScreen />
+          </Route>
           <Route path="/login">
             <LoginScreen />
           </Route>
@@ -29,7 +33,7 @@ export const Navigation = () => {
             <SignupScreen />
           </Route>
           <Route>
-            <Redirect href="/signup" />
+            <Redirect href="/" />
           </Route>
         </Switch>
       );
