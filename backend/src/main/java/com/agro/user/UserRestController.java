@@ -53,32 +53,6 @@ class UserRestController {
                                                 .body(new StatusResponseDTO("error", "User not found")));
         }
 
-        @PreAuthorize("hasRole('ADMIN')")
-        @PatchMapping(value = "/admin/update/{id}", produces = "application/json")
-        @Operation(summary = "Update an admin (admin only)")
-        @ResponseStatus(HttpStatus.OK)
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
-        Optional<ResponseEntity<StatusResponseDTO>> updateAdmin(
-                        @PathVariable Long id,
-                        @RequestBody UserUpdateDTO userDTO) {
-                return userService.updateAdmin(id, userDTO);
-        }
-
-        @PreAuthorize("hasRole('ADMIN')")
-        @PostMapping(value = "/admin/create", produces = "application/json")
-        @Operation(summary = "Create an admin (admin only)")
-        @ResponseStatus(HttpStatus.OK)
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-        @ApiResponse(responseCode = "409", description = "Email already register", content = @Content)
-        ResponseEntity<TokenDTO> createAdmin(
-                        @PathVariable Long id,
-                        @RequestBody UserCreateDTO userDTO) {
-                return userService.createUser(userDTO)
-                                .map(tk -> ResponseEntity.status(HttpStatus.CREATED).body(tk))
-                                .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
-        }
-
         @PreAuthorize("isAuthenticated()")
         @PatchMapping(value = "/update/me", produces = "application/json")
         @Operation(summary = "Update yourself")
@@ -92,17 +66,4 @@ class UserRestController {
                 return userService.updateUser(userDTO, currentUser.getId());
         }
 
-        @PreAuthorize("hasRole('ADMIN')")
-        @DeleteMapping(value = "/admin/delete/{id}", produces = "application/json")
-        @Operation(summary = "Delete a user or admin (admin only)")
-        @ResponseStatus(HttpStatus.OK)
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
-        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
-        ResponseEntity<StatusResponseDTO> deleteUser(
-                        @PathVariable Long id) {
-                return userService.deleteUser(id)
-                                .map(user -> ResponseEntity.ok(new StatusResponseDTO("success", "User deleted")))
-                                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                                .body(new StatusResponseDTO("error", "User not found")));
-        }
 }
