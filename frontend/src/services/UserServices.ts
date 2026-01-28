@@ -41,8 +41,10 @@ async function auth(endpoint: string, data: LoginRequest) {
   if (response.ok) {
     return LoginResponseSchema.parse(await response.json());
   } else if (response.status === 409) {
-    throw new Error("Email already registered");
+    throw new Error("El correo electrónico ya está registrado");
+  } else if (response.status === 401 || response.status === 403) {
+    throw new Error("Correo electrónico o contraseña incorrectos");
   } else {
-    throw new Error(`Failed with status ${response.status}: ${await response.text()}`);
+    throw new Error(`Falló con estado ${response.status}: ${await response.text()}`);
   }
 }
