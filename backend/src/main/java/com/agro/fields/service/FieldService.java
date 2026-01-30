@@ -3,7 +3,9 @@ package com.agro.fields.service;
 import com.agro.fields.dto.FieldCreateDTO;
 import com.agro.fields.dto.FieldResponseDTO;
 import com.agro.fields.model.Field;
+import com.agro.fields.model.LivestockHistory;
 import com.agro.fields.repository.FieldRepository;
+import com.agro.fields.repository.LivestockHistoryRepository;
 import com.agro.user.User;
 import com.agro.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,13 @@ public class FieldService {
 
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
+    private final LivestockHistoryRepository livestockHistoryRepository;
 
-    public FieldService(FieldRepository fieldRepository, UserRepository userRepository) {
+    public FieldService(FieldRepository fieldRepository, UserRepository userRepository,
+            LivestockHistoryRepository livestockHistoryRepository) {
         this.fieldRepository = fieldRepository;
         this.userRepository = userRepository;
+        this.livestockHistoryRepository = livestockHistoryRepository;
     }
 
     @Transactional(readOnly = true)
@@ -70,6 +75,22 @@ public class FieldService {
         Field field = new Field(createDTO.getName(), createDTO.getHectares(), photo, user,
                 createDTO.getHasAgriculture(), createDTO.getHasLivestock(), createDTO.getLatitude(),
                 createDTO.getLongitude());
+
+        if (createDTO.getCows() != null)
+            field.setCows(createDTO.getCows());
+        if (createDTO.getBulls() != null)
+            field.setBulls(createDTO.getBulls());
+        if (createDTO.getSteers() != null)
+            field.setSteers(createDTO.getSteers());
+        if (createDTO.getYoungSteers() != null)
+            field.setYoungSteers(createDTO.getYoungSteers());
+        if (createDTO.getHeifers() != null)
+            field.setHeifers(createDTO.getHeifers());
+        if (createDTO.getMaleCalves() != null)
+            field.setMaleCalves(createDTO.getMaleCalves());
+        if (createDTO.getFemaleCalves() != null)
+            field.setFemaleCalves(createDTO.getFemaleCalves());
+
         Field savedField = fieldRepository.save(field);
         return mapToDTO(savedField);
     }
@@ -126,12 +147,95 @@ public class FieldService {
         if (updateDTO.getLongitude() != null)
             field.setLongitude(updateDTO.getLongitude());
 
+        if (updateDTO.getCows() != null)
+            field.setCows(updateDTO.getCows());
+        if (updateDTO.getBulls() != null)
+            field.setBulls(updateDTO.getBulls());
+        if (updateDTO.getSteers() != null)
+            field.setSteers(updateDTO.getSteers());
+        if (updateDTO.getYoungSteers() != null)
+            field.setYoungSteers(updateDTO.getYoungSteers());
+        if (updateDTO.getHeifers() != null)
+            field.setHeifers(updateDTO.getHeifers());
+        if (updateDTO.getMaleCalves() != null)
+            field.setMaleCalves(updateDTO.getMaleCalves());
+        if (updateDTO.getFemaleCalves() != null)
+            field.setFemaleCalves(updateDTO.getFemaleCalves());
+
+        // Save history
+        LivestockHistory history = new LivestockHistory(field, java.time.LocalDate.now(),
+                field.getCows(), field.getBulls(), field.getSteers(), field.getYoungSteers(),
+                field.getHeifers(), field.getMaleCalves(), field.getFemaleCalves());
+        livestockHistoryRepository.save(history);
+
         Field updatedField = fieldRepository.save(field);
         return mapToDTO(updatedField);
     }
 
     private FieldResponseDTO mapToDTO(Field field) {
         return new FieldResponseDTO(field.getId(), field.getName(), field.getHectares(), field.getPhoto(),
-                field.getHasAgriculture(), field.getHasLivestock(), field.getLatitude(), field.getLongitude());
+                field.getHasAgriculture(), field.getHasLivestock(), field.getLatitude(), field.getLongitude(),
+                field.getCows(), field.getBulls(), field.getSteers(), field.getYoungSteers(), field.getHeifers(),
+                field.getMaleCalves(), field.getFemaleCalves());
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.agro.fields.dto.LivestockHistoryDTO> getLivestockHistory(Long userId, Long fieldId) {
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found"));
+
+        if (!field.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to field");
+        }
+
+        return livestockHistoryRepository.findByFieldIdOrderByDateAsc(fieldId).stream()
+                .map(h -> new com.agro.fields.dto.LivestockHistoryDTO(h.getDate(), h.getCows(), h.getBulls(),
+                        h.getSteers(), h.getYoungSteers(),
+                        h.getHeifers(), h.getMaleCalves(), h.getFemaleCalves()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.agro.fields.dto.LivestockHistoryDTO> getGlobalLivestockHistory(Long userId) {
+        List<LivestockHistory> allHistory = livestockHistoryRepository.findByUserId(userId);
+
+        // Map to store latest state of each field
+        // FieldId -> LivestockHistory (representing counts)
+        java.util.Map<Long, LivestockHistory> fieldStates = new java.util.HashMap<>();
+
+        // Group by Date to handle multiple updates on same day
+        java.util.Map<java.time.LocalDate, List<LivestockHistory>> byDate = allHistory.stream()
+                .collect(Collectors.groupingBy(LivestockHistory::getDate, java.util.TreeMap::new, Collectors.toList()));
+
+        List<com.agro.fields.dto.LivestockHistoryDTO> result = new java.util.ArrayList<>();
+
+        // Accumulate state over time
+        for (java.util.Map.Entry<java.time.LocalDate, List<LivestockHistory>> entry : byDate.entrySet()) {
+            java.time.LocalDate date = entry.getKey();
+            List<LivestockHistory> updates = entry.getValue();
+
+            // Apply updates
+            for (LivestockHistory update : updates) {
+                fieldStates.put(update.getField().getId(), update);
+            }
+
+            // Calculate totals
+            int cows = 0, bulls = 0, steers = 0, youngSteers = 0, heifers = 0, maleCalves = 0, femaleCalves = 0;
+
+            for (LivestockHistory state : fieldStates.values()) {
+                cows += state.getCows();
+                bulls += state.getBulls();
+                steers += state.getSteers();
+                youngSteers += state.getYoungSteers();
+                heifers += state.getHeifers();
+                maleCalves += state.getMaleCalves();
+                femaleCalves += state.getFemaleCalves();
+            }
+
+            result.add(new com.agro.fields.dto.LivestockHistoryDTO(
+                    date, cows, bulls, steers, youngSteers, heifers, maleCalves, femaleCalves));
+        }
+
+        return result;
     }
 }

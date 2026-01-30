@@ -9,6 +9,13 @@ export const FieldSchema = z.object({
     hasLivestock: z.boolean().nullable().optional(),
     latitude: z.number().nullable().optional(),
     longitude: z.number().nullable().optional(),
+    cows: z.number().nullable().optional(),
+    bulls: z.number().nullable().optional(),
+    steers: z.number().nullable().optional(),
+    youngSteers: z.number().nullable().optional(),
+    heifers: z.number().nullable().optional(),
+    maleCalves: z.number().nullable().optional(),
+    femaleCalves: z.number().nullable().optional(),
 });
 
 export type Field = z.infer<typeof FieldSchema>;
@@ -21,6 +28,13 @@ export const CreateFieldSchema = z.object({
     hasLivestock: z.boolean().optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
+    cows: z.number().optional(),
+    bulls: z.number().optional(),
+    steers: z.number().optional(),
+    youngSteers: z.number().optional(),
+    heifers: z.number().optional(),
+    maleCalves: z.number().optional(),
+    femaleCalves: z.number().optional(),
 });
 
 export type CreateFieldRequest = z.infer<typeof CreateFieldSchema>;

@@ -49,6 +49,13 @@ export const MainScreen = () => {
     hasLivestock: boolean;
     latitude: number | null;
     longitude: number | null;
+    cows: number;
+    bulls: number;
+    steers: number;
+    youngSteers: number;
+    heifers: number;
+    maleCalves: number;
+    femaleCalves: number;
   }>({
     name: "",
     hectares: "",
@@ -58,11 +65,21 @@ export const MainScreen = () => {
     hasLivestock: false,
     latitude: null,
     longitude: null,
+    cows: 0,
+    bulls: 0,
+    steers: 0,
+    youngSteers: 0,
+    heifers: 0,
+    maleCalves: 0,
+    femaleCalves: 0,
   });
   const [error, setError] = useState<string | null>(null);
 
   const handleOpenModal = () => {
-    setFormData({ name: "", hectares: "", photo: "", imageFile: null, hasAgriculture: false, hasLivestock: false, latitude: null, longitude: null });
+    setFormData({
+      name: "", hectares: "", photo: "", imageFile: null, hasAgriculture: false, hasLivestock: false, latitude: null, longitude: null,
+      cows: 0, bulls: 0, steers: 0, youngSteers: 0, heifers: 0, maleCalves: 0, femaleCalves: 0
+    });
     setError(null);
     setIsModalOpen(true);
   };
@@ -115,6 +132,13 @@ export const MainScreen = () => {
         hasLivestock: formData.hasLivestock,
         latitude: formData.latitude ?? undefined,
         longitude: formData.longitude ?? undefined,
+        cows: formData.cows,
+        bulls: formData.bulls,
+        steers: formData.steers,
+        youngSteers: formData.youngSteers,
+        heifers: formData.heifers,
+        maleCalves: formData.maleCalves,
+        femaleCalves: formData.femaleCalves,
       });
       handleCloseModal();
     } catch (err) {
@@ -248,7 +272,37 @@ export const MainScreen = () => {
                     />
                     Ganadería
                   </label>
+
                 </div>
+
+                {formData.hasLivestock && (
+                  <div className={styles.inputGroup} style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                    <label className={styles.label} style={{ marginBottom: '1rem' }}>Hacienda Inicial (Opcional)</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      {[
+                        { key: 'cows', label: 'Vacas' },
+                        { key: 'bulls', label: 'Toros' },
+                        { key: 'steers', label: 'Novillos' },
+                        { key: 'youngSteers', label: 'Novillitos' },
+                        { key: 'heifers', label: 'Vaquillonas' },
+                        { key: 'maleCalves', label: 'Terneros' },
+                        { key: 'femaleCalves', label: 'Terneras' },
+                      ].map((type) => (
+                        <div key={type.key}>
+                          <label className={styles.label} style={{ fontSize: '0.8rem', marginBottom: '0.2rem' }}>{type.label}</label>
+                          <input
+                            className={styles.input}
+                            type="number"
+                            min="0"
+                            value={formData[type.key as keyof typeof formData] as number}
+                            onChange={(e) => setFormData({ ...formData, [type.key]: parseInt(e.target.value) || 0 })}
+                            placeholder="0"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Ubicación (Marque en el mapa)</label>
@@ -334,37 +388,40 @@ export const MainScreen = () => {
             </div>
           </div>,
           document.body
-        )}
+        )
+        }
 
-        {deleteConfirmationId !== null && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
-              <h2 className={styles.h2} style={{ marginBottom: '1rem' }}>¿Eliminar campo?</h2>
-              <p style={{ color: '#cbd5e1', marginBottom: '2rem' }}>
-                ¿Estás seguro de que deseas eliminar este campo? Esta acción no se puede deshacer.
-              </p>
-              <div className={styles.modalActions}>
-                <button
-                  className={styles.cancelButton}
-                  onClick={handleCancelDelete}
-                  disabled={isDeleting}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className={styles.submitButton}
-                  style={{ background: '#ef4444' }}
-                  onClick={handleConfirmDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? "Eliminando..." : "Eliminar"}
-                </button>
+        {
+          deleteConfirmationId !== null && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+                <h2 className={styles.h2} style={{ marginBottom: '1rem' }}>¿Eliminar campo?</h2>
+                <p style={{ color: '#cbd5e1', marginBottom: '2rem' }}>
+                  ¿Estás seguro de que deseas eliminar este campo? Esta acción no se puede deshacer.
+                </p>
+                <div className={styles.modalActions}>
+                  <button
+                    className={styles.cancelButton}
+                    onClick={handleCancelDelete}
+                    disabled={isDeleting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className={styles.submitButton}
+                    style={{ background: '#ef4444' }}
+                    onClick={handleConfirmDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Eliminando..." : "Eliminar"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )
+        }
+      </div >
     </CommonLayout >
   );
 };

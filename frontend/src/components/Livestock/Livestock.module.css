@@ -1,0 +1,99 @@
+.actionCard {
+    background-color: #1e293b;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #334155;
+    margin-bottom: 2rem;
+}
+
+.title {
+    color: #f8fafc;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.historyList {
+    background: rgba(10, 15, 30, 0.6);
+    /* Slightly more transparent as requested */
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    /* Fixed height with scroll */
+    max-height: 400px;
+    overflow-y: auto;
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #3b82f6 rgba(10, 15, 30, 0.5);
+}
+
+.historyList::-webkit-scrollbar {
+    width: 8px;
+}
+
+.historyList::-webkit-scrollbar-track {
+    background: rgba(10, 15, 30, 0.5);
+    border-radius: 4px;
+}
+
+.historyList::-webkit-scrollbar-thumb {
+    background-color: #3b82f6;
+    border-radius: 4px;
+}
+
+.historyItem {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.historyItem:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.historyItem:last-child {
+    border-bottom: none;
+}
+
+.historyBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-BIRTH {
+    background: rgba(22, 101, 52, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.badge-DEATH {
+    background: rgba(153, 27, 27, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.badge-MOVE {
+    background: rgba(30, 64, 175, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.badge-SALE {
+    background: rgba(133, 77, 14, 0.2);
+    color: #fde047;
+    border: 1px solid rgba(253, 224, 71, 0.2);
+}
+
+.badge-PURCHASE {
+    background: rgba(55, 48, 163, 0.2);
+    color: #a5b4fc;
+    border: 1px solid rgba(165, 180, 252, 0.2);
+}

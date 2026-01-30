@@ -10,6 +10,9 @@ import { PartnersScreen } from "@/screens/PartnersScreen";
 import { FieldDetailScreen } from "@/screens/FieldDetailScreen";
 import { WeatherDashboardScreen } from "@/screens/WeatherDashboardScreen";
 
+import { LivestockScreen } from "@/screens/LivestockScreen";
+import { FieldLivestockScreen } from "@/screens/FieldLivestockScreen";
+
 export const Navigation = () => {
   const [tokenState] = useToken();
   switch (tokenState.state) {
@@ -22,11 +25,17 @@ export const Navigation = () => {
           <Route path="/partners">
             <PartnersScreen />
           </Route>
+          <Route path="/livestock">
+            <LivestockScreen />
+          </Route>
           <Route path="/fields/:id">
             {(params) => <FieldDetailScreen id={Number(params.id)} />}
           </Route>
           <Route path="/fields/:id/weather">
             {(params) => <WeatherDashboardScreen id={Number(params.id)} />}
+          </Route>
+          <Route path="/fields/:id/livestock">
+            {(params) => <FieldLivestockScreen id={Number(params.id)} />}
           </Route>
           <Route>
             <Redirect href="/" />

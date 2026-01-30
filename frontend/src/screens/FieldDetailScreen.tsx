@@ -43,6 +43,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
     const [weatherLoading, setWeatherLoading] = useState(false);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     const [editFormData, setEditFormData] = useState<{
         name: string;
         hectares: string;
@@ -50,6 +51,13 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
         hasLivestock: boolean;
         latitude: number | null;
         longitude: number | null;
+        cows: number;
+        bulls: number;
+        steers: number;
+        youngSteers: number;
+        heifers: number;
+        maleCalves: number;
+        femaleCalves: number;
     }>({
         name: "",
         hectares: "",
@@ -57,6 +65,13 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
         hasLivestock: false,
         latitude: null,
         longitude: null,
+        cows: 0,
+        bulls: 0,
+        steers: 0,
+        youngSteers: 0,
+        heifers: 0,
+        maleCalves: 0,
+        femaleCalves: 0,
     });
 
     useEffect(() => {
@@ -78,6 +93,13 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 hasLivestock: field.hasLivestock ?? false,
                 latitude: field.latitude ?? null,
                 longitude: field.longitude ?? null,
+                cows: field.cows ?? 0,
+                bulls: field.bulls ?? 0,
+                steers: field.steers ?? 0,
+                youngSteers: field.youngSteers ?? 0,
+                heifers: field.heifers ?? 0,
+                maleCalves: field.maleCalves ?? 0,
+                femaleCalves: field.femaleCalves ?? 0,
             });
             setIsEditModalOpen(true);
         }
@@ -95,6 +117,13 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                     hasLivestock: editFormData.hasLivestock,
                     latitude: editFormData.latitude ?? undefined,
                     longitude: editFormData.longitude ?? undefined,
+                    cows: editFormData.cows,
+                    bulls: editFormData.bulls,
+                    steers: editFormData.steers,
+                    youngSteers: editFormData.youngSteers,
+                    heifers: editFormData.heifers,
+                    maleCalves: editFormData.maleCalves,
+                    femaleCalves: editFormData.femaleCalves,
                 }
             });
             setIsEditModalOpen(false);
@@ -162,6 +191,27 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                             </div>
                         )}
                     </div>
+
+                    {/* Livestock Card */}
+                    {field.hasLivestock && (
+                        <Link href={`/fields/${id}/livestock`}>
+                            <a className={styles.card} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <h3 className={styles.cardTitle} style={{ marginBottom: 0, borderBottom: 'none' }}>Ganadería ({((field.cows || 0) + (field.bulls || 0) + (field.steers || 0) + (field.youngSteers || 0) + (field.heifers || 0) + (field.maleCalves || 0) + (field.femaleCalves || 0))})</h3>
+                                    <span style={{ fontSize: '0.9rem', color: '#60a5fa' }}>Ver Detalle →</span>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', color: '#cbd5e1' }}>
+                                    <div className={styles.infoRow}>Vacas: {field.cows || 0}</div>
+                                    <div className={styles.infoRow}>Toros: {field.bulls || 0}</div>
+                                    <div className={styles.infoRow}>Novillos: {field.steers || 0}</div>
+                                    <div className={styles.infoRow}>Novillitos: {field.youngSteers || 0}</div>
+                                    <div className={styles.infoRow}>Vaquillonas: {field.heifers || 0}</div>
+                                    <div className={styles.infoRow}>Terneros: {field.maleCalves || 0}</div>
+                                    <div className={styles.infoRow}>Terneras: {field.femaleCalves || 0}</div>
+                                </div>
+                            </a>
+                        </Link>
+                    )}
 
                     {/* Weather Card */}
                     <Link href={`/fields/${id}/weather`}>
@@ -277,6 +327,42 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                         Ganadería
                                     </label>
                                 </div>
+
+                                {editFormData.hasLivestock && (
+                                    <div className={styles.inputGroup}>
+                                        <label className={styles.label}>Inventario Ganadero</label>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Vacas</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.cows} onChange={(e) => setEditFormData({ ...editFormData, cows: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Toros</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.bulls} onChange={(e) => setEditFormData({ ...editFormData, bulls: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Novillos</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.steers} onChange={(e) => setEditFormData({ ...editFormData, steers: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Novillitos</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.youngSteers} onChange={(e) => setEditFormData({ ...editFormData, youngSteers: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Vaquillonas</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.heifers} onChange={(e) => setEditFormData({ ...editFormData, heifers: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Terneros</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.maleCalves} onChange={(e) => setEditFormData({ ...editFormData, maleCalves: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                            <div>
+                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Terneras</label>
+                                                <input className={styles.input} type="number" min="0" value={editFormData.femaleCalves} onChange={(e) => setEditFormData({ ...editFormData, femaleCalves: parseInt(e.target.value) || 0 })} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className={styles.inputGroup}>
                                     <label className={styles.label}>Ubicación (Marque en el mapa)</label>
