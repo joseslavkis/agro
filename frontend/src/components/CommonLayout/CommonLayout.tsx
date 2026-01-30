@@ -3,7 +3,7 @@ import { Link } from "wouter";
 
 import { useToken } from "@/services/TokenContext";
 
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo_no_words.jpg";
 import styles from "./CommonLayout.module.css";
 
 export const CommonLayout = ({ children, showVideo = true, contentClassName, contentStyle }: React.PropsWithChildren<{ showVideo?: boolean, contentClassName?: string, contentStyle?: React.CSSProperties }>) => {
@@ -39,8 +39,13 @@ const LoggedOutLinks = () => {
   );
 };
 
+import { useMyFields } from "@/services/FieldServices";
+
 const LoggedInLinks = () => {
   const [, setTokenState] = useToken();
+  const { data: fields } = useMyFields();
+
+  const hasLivestock = fields?.some(field => field.hasLivestock);
 
   const logOut = () => {
     setTokenState({ state: "LOGGED_OUT" });
@@ -51,6 +56,11 @@ const LoggedInLinks = () => {
       <li>
         <Link href="/">Mis Campos</Link>
       </li>
+      {hasLivestock && (
+        <li>
+          <Link href="/livestock">Ganadería</Link>
+        </li>
+      )}
       <li>
         <Link href="/partners">Socios</Link>
       </li>

@@ -73,7 +73,14 @@ export function useCreateField() {
                 hasAgriculture: data.hasAgriculture,
                 hasLivestock: data.hasLivestock,
                 latitude: data.latitude,
-                longitude: data.longitude
+                longitude: data.longitude,
+                cows: data.cows,
+                bulls: data.bulls,
+                steers: data.steers,
+                youngSteers: data.youngSteers,
+                heifers: data.heifers,
+                maleCalves: data.maleCalves,
+                femaleCalves: data.femaleCalves,
             })], { type: "application/json" }));
 
             if (data.imageFile) {
@@ -159,3 +166,43 @@ export function useUpdateField() {
         },
     });
 }
+
+export const LivestockHistorySchema = z.object({
+    date: z.string(),
+    cows: z.number(),
+    bulls: z.number(),
+    steers: z.number(),
+    youngSteers: z.number(),
+    heifers: z.number(),
+    maleCalves: z.number(),
+    femaleCalves: z.number(),
+});
+
+export type LivestockHistory = z.infer<typeof LivestockHistorySchema>;
+
+export function useLivestockHistory(fieldId: number | null) {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+
+    return useQuery({
+        queryKey: ["livestockHistory", fieldId],
+        queryFn: async () => {
+            if (!token || fieldId === null) throw new Error("Not logged in");
+            const response = await fetch(`${BASE_API_URL}/api/v1/fields/${fieldId}/history`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error fetching history");
+            }
+
+            const data = await response.json();
+            return z.array(LivestockHistorySchema).parse(data);
+        },
+        enabled: !!token && fieldId !== null,
+    });
+}
+
