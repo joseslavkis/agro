@@ -78,4 +78,10 @@ public class FieldController {
             @AuthenticationPrincipal User user, @PathVariable Long id) {
         return ResponseEntity.ok(fieldService.getLivestockHistory(user.getId(), id));
     }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<com.agro.fields.dto.LivestockHistoryDTO>> getGlobalLivestockHistory(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(fieldService.getGlobalLivestockHistory(user.getId()));
+    }
 }

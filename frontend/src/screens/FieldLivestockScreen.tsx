@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useField, useUpdateField, useLivestockHistory } from "@/services/FieldServices";
+import { useField, useLivestockHistory } from "@/services/FieldServices";
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
 import styles from "./FieldDetailScreen.module.css";
 import { createPortal } from "react-dom";
@@ -9,10 +9,8 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 export const FieldLivestockScreen = ({ id }: { id: number }) => {
     const { data: field, isLoading, error } = useField(id);
     const { data: history } = useLivestockHistory(id);
-    const { mutateAsync: updateField, isPending: isUpdating } = useUpdateField();
 
     const [selectedAnimal, setSelectedAnimal] = useState<string | null>(null);
-    const [editValue, setEditValue] = useState<number>(0);
 
     const animalTypes = [
         { key: 'cows', label: 'Vacas' },
@@ -30,25 +28,7 @@ export const FieldLivestockScreen = ({ id }: { id: number }) => {
     const totalHeads = animalTypes.reduce((acc, type) => acc + (field[type.key as keyof typeof field] as number || 0), 0);
 
     const handleCardClick = (key: string) => {
-        const val = field[key as keyof typeof field] as number || 0;
-        setEditValue(val);
         setSelectedAnimal(key);
-    };
-
-    const handleSave = async () => {
-        if (!selectedAnimal) return;
-        try {
-            await updateField({
-                id,
-                data: {
-                    [selectedAnimal]: editValue
-                }
-            });
-            setSelectedAnimal(null);
-        } catch (e) {
-            console.error(e);
-            alert("Error al guardar");
-        }
     };
 
     // Prepare chart data
@@ -126,27 +106,19 @@ export const FieldLivestockScreen = ({ id }: { id: number }) => {
                                 {chartData.length === 0 && <p style={{ textAlign: 'center', color: '#64748b' }}>No hay datos históricos aún.</p>}
                             </div>
 
-                            {/* Edit Input (Only if not total) */}
+                            {/* Removed Edit Input - Read Only Mode */}
                             {selectedAnimal !== 'total' && (
-                                <div className={styles.inputGroup}>
-                                    <label className={styles.label}>Cantidad Actual</label>
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <input
-                                            className={styles.input}
-                                            type="number"
-                                            min="0"
-                                            value={editValue}
-                                            onChange={(e) => setEditValue(parseInt(e.target.value) || 0)}
-                                        />
-                                        <button
-                                            className={styles.submitButton}
-                                            style={{ width: 'auto', padding: '0 2rem' }}
-                                            onClick={handleSave}
-                                            disabled={isUpdating}
-                                        >
-                                            {isUpdating ? 'Guardando...' : 'Guardar'}
-                                        </button>
-                                    </div>
+                                <div style={{
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    padding: '1rem',
+                                    borderRadius: '0.5rem',
+                                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <p style={{ color: '#93c5fd', margin: 0, fontSize: '0.9rem' }}>
+                                        ℹ️ Para modificar el stock (Nacimientos, Mortandad, Movimientos), por favor utilice la sección de
+                                        <Link href="/livestock"><strong> Ganadería General</strong></Link>.
+                                    </p>
                                 </div>
                             )}
 
