@@ -194,7 +194,8 @@
     border: 1px solid rgba(59, 130, 246, 0.3);
     box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.9);
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 90vh;
     /* Ensure it doesn't get squashed */
     margin: 2rem;
 }
