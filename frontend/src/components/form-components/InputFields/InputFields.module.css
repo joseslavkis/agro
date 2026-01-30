@@ -36,6 +36,11 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.input option {
+  background-color: #1e293b;
+  color: white;
+}
+
 .dataContainer {
   display: flex;
   flex-direction: column;

@@ -28,6 +28,11 @@ public class FieldController {
         return ResponseEntity.ok(fieldService.getFieldsByUserId(user.getId()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<FieldResponseDTO> getField(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(fieldService.getFieldById(user.getId(), id));
+    }
+
     @PostMapping
     public ResponseEntity<FieldResponseDTO> createField(@AuthenticationPrincipal User user,
             @RequestPart("field") FieldCreateDTO createDTO,
@@ -60,5 +65,11 @@ public class FieldController {
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FieldResponseDTO> updateField(@AuthenticationPrincipal User user, @PathVariable Long id,
+            @RequestBody FieldCreateDTO updateDTO) {
+        return ResponseEntity.ok(fieldService.updateField(user.getId(), id, updateDTO));
     }
 }

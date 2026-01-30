@@ -30,6 +30,32 @@ export function useMyFields() {
     });
 }
 
+export function useField(id: number | null) {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+
+    return useQuery({
+        queryKey: ["field", id],
+        queryFn: async () => {
+            if (!token || id === null) throw new Error("Not logged in or invalid id");
+            const response = await fetch(`${BASE_API_URL}/api/v1/fields/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error fetching field");
+            }
+
+            const data = await response.json();
+            return FieldSchema.parse(data);
+        },
+        enabled: !!token && id !== null,
+    });
+}
+
 export function useCreateField() {
     const [tokenState] = useToken();
     const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
@@ -43,7 +69,11 @@ export function useCreateField() {
             formData.append("field", new Blob([JSON.stringify({
                 name: data.name,
                 hectares: data.hectares,
-                photo: data.photo // Keeping this for fallback if user clears file manually but keeps url? Or just ignore
+                photo: data.photo,
+                hasAgriculture: data.hasAgriculture,
+                hasLivestock: data.hasLivestock,
+                latitude: data.latitude,
+                longitude: data.longitude
             })], { type: "application/json" }));
 
             if (data.imageFile) {
@@ -94,6 +124,38 @@ export function useDeleteField() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["fields"] });
+        },
+    });
+}
+
+export function useUpdateField() {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: Partial<CreateFieldRequest> }) => {
+            if (!token) throw new Error("Not logged in");
+
+            const response = await fetch(`${BASE_API_URL}/api/v1/fields/${id}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Error updating field: ${response.status} ${text}`);
+            }
+
+            return FieldSchema.parse(await response.json());
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["fields"] });
+            queryClient.invalidateQueries({ queryKey: ["field", data.id] });
         },
     });
 }

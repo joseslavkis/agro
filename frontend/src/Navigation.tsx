@@ -7,6 +7,8 @@ import { WelcomeScreen } from "@/screens/WelcomeScreen";
 import { useToken } from "@/services/TokenContext";
 
 import { PartnersScreen } from "@/screens/PartnersScreen";
+import { FieldDetailScreen } from "@/screens/FieldDetailScreen";
+import { WeatherDashboardScreen } from "@/screens/WeatherDashboardScreen";
 
 export const Navigation = () => {
   const [tokenState] = useToken();
@@ -19,6 +21,12 @@ export const Navigation = () => {
           </Route>
           <Route path="/partners">
             <PartnersScreen />
+          </Route>
+          <Route path="/fields/:id">
+            {(params) => <FieldDetailScreen id={Number(params.id)} />}
+          </Route>
+          <Route path="/fields/:id/weather">
+            {(params) => <WeatherDashboardScreen id={Number(params.id)} />}
           </Route>
           <Route>
             <Redirect href="/" />
