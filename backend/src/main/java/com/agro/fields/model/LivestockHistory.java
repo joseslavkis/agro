@@ -3,7 +3,8 @@ package com.agro.fields.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity(name = "livestock_history")
+@Entity
+@Table(name = "livestock_history")
 public class LivestockHistory {
 
     @Id

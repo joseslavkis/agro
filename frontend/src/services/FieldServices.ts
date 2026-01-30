@@ -206,3 +206,29 @@ export function useLivestockHistory(fieldId: number | null) {
     });
 }
 
+export function useGlobalLivestockHistory() {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+
+    return useQuery({
+        queryKey: ["globalLivestockHistory"],
+        queryFn: async () => {
+            if (!token) throw new Error("Not logged in");
+            const response = await fetch(`${BASE_API_URL}/api/v1/fields/history`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error fetching global history");
+            }
+
+            const data = await response.json();
+            return z.array(LivestockHistorySchema).parse(data);
+        },
+        enabled: !!token,
+    });
+}
+

@@ -197,6 +197,11 @@
     width: 100%;
 }
 
+select.input option {
+    background-color: #0f172a;
+    color: white;
+}
+
 .cancelButton {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);

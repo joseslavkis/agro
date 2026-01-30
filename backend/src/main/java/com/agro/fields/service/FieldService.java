@@ -194,4 +194,48 @@ public class FieldService {
                         h.getHeifers(), h.getMaleCalves(), h.getFemaleCalves()))
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<com.agro.fields.dto.LivestockHistoryDTO> getGlobalLivestockHistory(Long userId) {
+        List<LivestockHistory> allHistory = livestockHistoryRepository.findByUserId(userId);
+
+        // Map to store latest state of each field
+        // FieldId -> LivestockHistory (representing counts)
+        java.util.Map<Long, LivestockHistory> fieldStates = new java.util.HashMap<>();
+
+        // Group by Date to handle multiple updates on same day
+        java.util.Map<java.time.LocalDate, List<LivestockHistory>> byDate = allHistory.stream()
+                .collect(Collectors.groupingBy(LivestockHistory::getDate, java.util.TreeMap::new, Collectors.toList()));
+
+        List<com.agro.fields.dto.LivestockHistoryDTO> result = new java.util.ArrayList<>();
+
+        // Accumulate state over time
+        for (java.util.Map.Entry<java.time.LocalDate, List<LivestockHistory>> entry : byDate.entrySet()) {
+            java.time.LocalDate date = entry.getKey();
+            List<LivestockHistory> updates = entry.getValue();
+
+            // Apply updates
+            for (LivestockHistory update : updates) {
+                fieldStates.put(update.getField().getId(), update);
+            }
+
+            // Calculate totals
+            int cows = 0, bulls = 0, steers = 0, youngSteers = 0, heifers = 0, maleCalves = 0, femaleCalves = 0;
+
+            for (LivestockHistory state : fieldStates.values()) {
+                cows += state.getCows();
+                bulls += state.getBulls();
+                steers += state.getSteers();
+                youngSteers += state.getYoungSteers();
+                heifers += state.getHeifers();
+                maleCalves += state.getMaleCalves();
+                femaleCalves += state.getFemaleCalves();
+            }
+
+            result.add(new com.agro.fields.dto.LivestockHistoryDTO(
+                    date, cows, bulls, steers, youngSteers, heifers, maleCalves, femaleCalves));
+        }
+
+        return result;
+    }
 }

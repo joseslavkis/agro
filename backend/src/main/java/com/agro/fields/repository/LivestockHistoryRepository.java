@@ -13,4 +13,7 @@ public interface LivestockHistoryRepository extends JpaRepository<LivestockHisto
     List<LivestockHistory> findByFieldIdOrderByDateAsc(Long fieldId);
 
     Optional<LivestockHistory> findByFieldIdAndDate(Long fieldId, LocalDate date);
+
+    @org.springframework.data.jpa.repository.Query("SELECT h FROM LivestockHistory h JOIN h.field f WHERE f.user.id = :userId ORDER BY h.date ASC")
+    List<LivestockHistory> findByUserId(@org.springframework.data.repository.query.Param("userId") Long userId);
 }
