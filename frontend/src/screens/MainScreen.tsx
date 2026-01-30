@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
 import { useMyFields, useCreateField, useDeleteField } from "@/services/FieldServices";
 import { getFieldPhotoUrl } from "@/utils/field-photos";
@@ -194,7 +195,7 @@ export const MainScreen = () => {
           )}
         </div>
 
-        {isModalOpen && (
+        {isModalOpen && createPortal(
           <div className={styles.modalOverlay} onClick={(e) => {
             if (e.target === e.currentTarget) handleCloseModal();
           }}>
@@ -331,7 +332,8 @@ export const MainScreen = () => {
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {deleteConfirmationId !== null && (
