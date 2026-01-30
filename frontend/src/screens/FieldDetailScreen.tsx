@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useField, useUpdateField } from "@/services/FieldServices";
 import { fetchWeather, getWeatherDescription, WeatherData } from "@/services/WeatherService";
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
@@ -227,7 +228,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 </div>
 
                 {/* Edit Modal */}
-                {isEditModalOpen && (
+                {isEditModalOpen && createPortal(
                     <div className={styles.modalOverlay} onClick={(e) => {
                         if (e.target === e.currentTarget) setIsEditModalOpen(false);
                     }}>
@@ -311,7 +312,8 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
         </CommonLayout>
