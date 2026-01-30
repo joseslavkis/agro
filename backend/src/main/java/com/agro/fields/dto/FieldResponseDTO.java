@@ -11,8 +11,18 @@ public class FieldResponseDTO {
     private Double latitude;
     private Double longitude;
 
+    private Integer cows;
+    private Integer bulls;
+    private Integer steers;
+    private Integer youngSteers;
+    private Integer heifers;
+    private Integer maleCalves;
+    private Integer femaleCalves;
+
     public FieldResponseDTO(Long id, String name, Double hectares, String photo, Boolean hasAgriculture,
-            Boolean hasLivestock, Double latitude, Double longitude) {
+            Boolean hasLivestock, Double latitude, Double longitude,
+            Integer cows, Integer bulls, Integer steers, Integer youngSteers, Integer heifers, Integer maleCalves,
+            Integer femaleCalves) {
         this.id = id;
         this.name = name;
         this.hectares = hectares;
@@ -21,6 +31,13 @@ public class FieldResponseDTO {
         this.hasLivestock = hasLivestock;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.cows = cows;
+        this.bulls = bulls;
+        this.steers = steers;
+        this.youngSteers = youngSteers;
+        this.heifers = heifers;
+        this.maleCalves = maleCalves;
+        this.femaleCalves = femaleCalves;
     }
 
     public Long getId() {
@@ -85,5 +102,61 @@ public class FieldResponseDTO {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public Integer getCows() {
+        return cows;
+    }
+
+    public void setCows(Integer cows) {
+        this.cows = cows;
+    }
+
+    public Integer getBulls() {
+        return bulls;
+    }
+
+    public void setBulls(Integer bulls) {
+        this.bulls = bulls;
+    }
+
+    public Integer getSteers() {
+        return steers;
+    }
+
+    public void setSteers(Integer steers) {
+        this.steers = steers;
+    }
+
+    public Integer getYoungSteers() {
+        return youngSteers;
+    }
+
+    public void setYoungSteers(Integer youngSteers) {
+        this.youngSteers = youngSteers;
+    }
+
+    public Integer getHeifers() {
+        return heifers;
+    }
+
+    public void setHeifers(Integer heifers) {
+        this.heifers = heifers;
+    }
+
+    public Integer getMaleCalves() {
+        return maleCalves;
+    }
+
+    public void setMaleCalves(Integer maleCalves) {
+        this.maleCalves = maleCalves;
+    }
+
+    public Integer getFemaleCalves() {
+        return femaleCalves;
+    }
+
+    public void setFemaleCalves(Integer femaleCalves) {
+        this.femaleCalves = femaleCalves;
     }
 }
