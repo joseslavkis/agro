@@ -72,4 +72,10 @@ public class FieldController {
             @RequestBody FieldCreateDTO updateDTO) {
         return ResponseEntity.ok(fieldService.updateField(user.getId(), id, updateDTO));
     }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<com.agro.fields.dto.LivestockHistoryDTO>> getLivestockHistory(
+            @AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(fieldService.getLivestockHistory(user.getId(), id));
+    }
 }

@@ -8,7 +8,16 @@ public class FieldCreateDTO {
     private Boolean hasAgriculture;
     private Boolean hasLivestock;
     private Double latitude;
+
     private Double longitude;
+
+    private Integer cows;
+    private Integer bulls;
+    private Integer steers;
+    private Integer youngSteers;
+    private Integer heifers;
+    private Integer maleCalves;
+    private Integer femaleCalves;
 
     public String getName() {
         return name;
@@ -64,5 +73,61 @@ public class FieldCreateDTO {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public Integer getCows() {
+        return cows;
+    }
+
+    public void setCows(Integer cows) {
+        this.cows = cows;
+    }
+
+    public Integer getBulls() {
+        return bulls;
+    }
+
+    public void setBulls(Integer bulls) {
+        this.bulls = bulls;
+    }
+
+    public Integer getSteers() {
+        return steers;
+    }
+
+    public void setSteers(Integer steers) {
+        this.steers = steers;
+    }
+
+    public Integer getYoungSteers() {
+        return youngSteers;
+    }
+
+    public void setYoungSteers(Integer youngSteers) {
+        this.youngSteers = youngSteers;
+    }
+
+    public Integer getHeifers() {
+        return heifers;
+    }
+
+    public void setHeifers(Integer heifers) {
+        this.heifers = heifers;
+    }
+
+    public Integer getMaleCalves() {
+        return maleCalves;
+    }
+
+    public void setMaleCalves(Integer maleCalves) {
+        this.maleCalves = maleCalves;
+    }
+
+    public Integer getFemaleCalves() {
+        return femaleCalves;
+    }
+
+    public void setFemaleCalves(Integer femaleCalves) {
+        this.femaleCalves = femaleCalves;
     }
 }

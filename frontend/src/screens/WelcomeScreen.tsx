@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo_no_words.jpg";
 import styles from "./WelcomeScreen.module.css";
 
 export const WelcomeScreen = () => {
