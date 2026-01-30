@@ -15,27 +15,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class, produces = "text/plain")
-    @ApiResponse(
-            responseCode = "400",
-            description = "Invalid arguments supplied",
-            content = @Content(
-                    mediaType = "text/plain",
-                    schema = @Schema(implementation = String.class, example = "Validation failed because x, y, z")
-            )
-    )
+    @ApiResponse(responseCode = "400", description = "Invalid arguments supplied", content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class, example = "Validation failed because x, y, z")))
     public ResponseEntity<String> handleMethodArgumentInvalid(MethodArgumentNotValidException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = ItemNotFoundException.class, produces = "text/plain")
-    @ApiResponse(
-            responseCode = "404",
-            description = "Referenced entity not found",
-            content = @Content(
-                    mediaType = "text/plain",
-                    schema = @Schema(implementation = String.class, example = "Failed to find foo with id 42")
-            )
-    )
+    @ApiResponse(responseCode = "404", description = "Referenced entity not found", content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class, example = "Failed to find foo with id 42")))
     public ResponseEntity<String> handleItemNotFound(ItemNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
@@ -46,11 +32,16 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(
+            org.springframework.web.server.ResponseStatusException ex) {
+        return new ResponseEntity<>(ex.getReason(), ex.getStatusCode());
+    }
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<String> handleFallback(Throwable ex) {
         return new ResponseEntity<>(
                 ex.getClass().getCanonicalName() + " " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

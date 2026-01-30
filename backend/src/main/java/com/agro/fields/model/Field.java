@@ -19,6 +19,18 @@ public class Field {
     @Column(nullable = true)
     private String photo;
 
+    @Column(name = "has_agriculture")
+    private Boolean hasAgriculture;
+
+    @Column(name = "has_livestock")
+    private Boolean hasLivestock;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -26,11 +38,16 @@ public class Field {
     public Field() {
     }
 
-    public Field(String name, Double hectares, String photo, User user) {
+    public Field(String name, Double hectares, String photo, User user, Boolean hasAgriculture, Boolean hasLivestock,
+            Double latitude, Double longitude) {
         this.name = name;
         this.hectares = hectares;
         this.photo = photo;
         this.user = user;
+        this.hasAgriculture = hasAgriculture;
+        this.hasLivestock = hasLivestock;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Long getId() {
@@ -71,5 +88,37 @@ public class Field {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getHasAgriculture() {
+        return hasAgriculture;
+    }
+
+    public void setHasAgriculture(Boolean hasAgriculture) {
+        this.hasAgriculture = hasAgriculture;
+    }
+
+    public Boolean getHasLivestock() {
+        return hasLivestock;
+    }
+
+    public void setHasLivestock(Boolean hasLivestock) {
+        this.hasLivestock = hasLivestock;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

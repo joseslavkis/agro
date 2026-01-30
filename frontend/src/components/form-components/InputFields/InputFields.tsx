@@ -28,7 +28,7 @@ const FieldWithType = ({ label, type }: { label: string; type: string }) => {
           value={field.state.value}
           className={styles.input}
           type={type}
-          onBlur={field.handleBlur}
+
           onChange={(e) => field.handleChange(e.target.value)}
         />
         {field.state.meta.isTouched && <ErrorContainer errors={field.state.meta.errors} />}
@@ -55,7 +55,7 @@ export const SelectField = ({ label, options }: { label: string, options: { valu
           name={field.name}
           value={field.state.value}
           className={styles.input}
-          onBlur={field.handleBlur}
+
           onChange={(e) => field.handleChange(e.target.value)}
         >
           {options.map(opt => (

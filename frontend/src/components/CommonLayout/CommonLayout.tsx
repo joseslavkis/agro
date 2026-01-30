@@ -6,20 +6,22 @@ import { useToken } from "@/services/TokenContext";
 import logo from "@/assets/logo.jpg";
 import styles from "./CommonLayout.module.css";
 
-export const CommonLayout = ({ children }: React.PropsWithChildren) => {
+export const CommonLayout = ({ children, showVideo = true, contentClassName, contentStyle }: React.PropsWithChildren<{ showVideo?: boolean, contentClassName?: string, contentStyle?: React.CSSProperties }>) => {
   const [tokenState] = useToken();
 
   return (
     <div className={styles.mainLayout}>
-      <video autoPlay loop muted playsInline className={styles.backgroundVideo}>
-        <source src="/background.mp4" type="video/mp4" />
-      </video>
+      {showVideo && (
+        <video autoPlay loop muted playsInline className={styles.backgroundVideo}>
+          <source src="/background.mp4" type="video/mp4" />
+        </video>
+      )}
       <div className={styles.overlay} />
       <nav className={styles.topBar}>
         <img src={logo} alt="Agro Logo" className={styles.logo} />
         <ul className={styles.navLinks}>{tokenState.state === "LOGGED_OUT" ? <LoggedOutLinks /> : <LoggedInLinks />}</ul>
       </nav>
-      <div className={styles.body}>{children}</div>
+      <div className={`${styles.body} ${contentClassName || ''}`} style={contentStyle}>{children}</div>
     </div>
   );
 };

@@ -30,6 +30,18 @@ public class FieldService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public FieldResponseDTO getFieldById(Long userId, Long fieldId) {
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found"));
+
+        if (!field.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to field");
+        }
+
+        return mapToDTO(field);
+    }
+
     private static final List<String> DEFAULT_PHOTOS = List.of(
             "/fields_photos/pexels-despierres-cecile-93261-299031.jpg",
             "/fields_photos/pexels-kaip-585039.jpg",
@@ -55,7 +67,9 @@ public class FieldService {
             photo = createDTO.getPhoto();
         }
 
-        Field field = new Field(createDTO.getName(), createDTO.getHectares(), photo, user);
+        Field field = new Field(createDTO.getName(), createDTO.getHectares(), photo, user,
+                createDTO.getHasAgriculture(), createDTO.getHasLivestock(), createDTO.getLatitude(),
+                createDTO.getLongitude());
         Field savedField = fieldRepository.save(field);
         return mapToDTO(savedField);
     }
@@ -90,7 +104,34 @@ public class FieldService {
         }
     }
 
+    @Transactional
+    public FieldResponseDTO updateField(Long userId, Long fieldId, FieldCreateDTO updateDTO) {
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found"));
+
+        if (!field.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to field");
+        }
+
+        if (updateDTO.getName() != null)
+            field.setName(updateDTO.getName());
+        if (updateDTO.getHectares() != null)
+            field.setHectares(updateDTO.getHectares());
+        if (updateDTO.getHasAgriculture() != null)
+            field.setHasAgriculture(updateDTO.getHasAgriculture());
+        if (updateDTO.getHasLivestock() != null)
+            field.setHasLivestock(updateDTO.getHasLivestock());
+        if (updateDTO.getLatitude() != null)
+            field.setLatitude(updateDTO.getLatitude());
+        if (updateDTO.getLongitude() != null)
+            field.setLongitude(updateDTO.getLongitude());
+
+        Field updatedField = fieldRepository.save(field);
+        return mapToDTO(updatedField);
+    }
+
     private FieldResponseDTO mapToDTO(Field field) {
-        return new FieldResponseDTO(field.getId(), field.getName(), field.getHectares(), field.getPhoto());
+        return new FieldResponseDTO(field.getId(), field.getName(), field.getHectares(), field.getPhoto(),
+                field.getHasAgriculture(), field.getHasLivestock(), field.getLatitude(), field.getLongitude());
     }
 }
