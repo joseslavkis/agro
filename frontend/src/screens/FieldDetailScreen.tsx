@@ -43,6 +43,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
     const [weatherLoading, setWeatherLoading] = useState(false);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [formError, setFormError] = useState<string | null>(null);
 
     const [editFormData, setEditFormData] = useState<{
         name: string;
@@ -101,6 +102,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 maleCalves: field.maleCalves ?? 0,
                 femaleCalves: field.femaleCalves ?? 0,
             });
+            setFormError(null);
             setIsEditModalOpen(true);
         }
     };
@@ -127,9 +129,29 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 }
             });
             setIsEditModalOpen(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating field:", error);
-            alert("Error al actualizar el campo");
+            let errorMessage = "Error al actualizar el campo";
+
+            // Try to parse validation error
+            if (error.message && error.message.includes("400")) {
+                try {
+                    const jsonStart = error.message.indexOf('{');
+                    if (jsonStart !== -1) {
+                        const jsonStr = error.message.substring(jsonStart);
+                        const data = JSON.parse(jsonStr);
+                        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+                            errorMessage = data.errors[0].defaultMessage || errorMessage;
+                        } else if (data.message) {
+                            errorMessage = data.message;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Parsing error failed", e);
+                }
+            }
+
+            setFormError(errorMessage);
         }
     };
 
@@ -371,6 +393,12 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                         </MapContainer>
                                     </div>
                                 </div>
+
+                                {formError && (
+                                    <div style={{ color: "#ff6b6b", marginBottom: "1rem", backgroundColor: 'rgba(255, 107, 107, 0.1)', padding: '0.5rem', borderRadius: '0.5rem' }}>
+                                        {formError}
+                                    </div>
+                                )}
 
                                 <div className={styles.modalActions}>
                                     <button

@@ -141,9 +141,35 @@ export const MainScreen = () => {
         femaleCalves: formData.femaleCalves,
       });
       handleCloseModal();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Error al crear el campo. Intente nuevamente.");
+      let errorMessage = "Error al crear el campo. Intente nuevamente.";
+
+      // Try to extract detailed message from the error object
+      if (err.message && err.message.includes("400")) {
+        try {
+          // The error string format is "Error creating field: 400 {json}"
+          // We try to find the starting brace of the JSON
+          const jsonStart = err.message.indexOf('{');
+          if (jsonStart !== -1) {
+            const jsonStr = err.message.substring(jsonStart);
+            const data = JSON.parse(jsonStr);
+
+            // Spring Boot Validation Errors usually come in 'errors' array
+            if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+              errorMessage = data.errors[0].defaultMessage || errorMessage;
+            }
+            // Or sometimes directly in message field
+            else if (data.message) {
+              errorMessage = data.message;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse error response", e);
+        }
+      }
+
+      setError(errorMessage);
     }
   };
 
