@@ -15,15 +15,12 @@
 
 .historyList {
     background: rgba(10, 15, 30, 0.6);
-    /* Slightly more transparent as requested */
     backdrop-filter: blur(12px);
     border-radius: 1rem;
     padding: 1.5rem;
     border: 1px solid rgba(59, 130, 246, 0.2);
-    /* Fixed height with scroll */
     max-height: 400px;
     overflow-y: auto;
-    /* Custom Scrollbar */
     scrollbar-width: thin;
     scrollbar-color: #3b82f6 rgba(10, 15, 30, 0.5);
 }
@@ -96,4 +93,180 @@
     background: rgba(55, 48, 163, 0.2);
     color: #a5b4fc;
     border: 1px solid rgba(165, 180, 252, 0.2);
+}
+
+/* Modal and Form Styles - Copied and adapted from FieldDetailScreen for consistency */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modalContent {
+    background: #0f172a;
+    padding: 3rem;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 500px;
+    /* Slightly tighter for transaction edit */
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.9);
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+    margin: 2rem;
+}
+
+.modalContent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.h2 {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.inputGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input:focus,
+.select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+select.select option {
+    background-color: #0f172a;
+    color: white;
+}
+
+.modalActions {
+    display: flex;
+    /* Changed to flex for better control */
+    gap: 1rem;
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+.cancelButton {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.cancelButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: white;
+    color: white;
+}
+
+.submitButton {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    flex: 1;
+}
+
+.submitButton:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.deleteButton {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.deleteButton:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #f87171;
+    color: #fecaca;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.infoBox {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.infoText {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.6;
 }

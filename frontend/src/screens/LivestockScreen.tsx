@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import { LivestockSummary } from "@/components/Livestock/LivestockSummary";
 import { LivestockActionForm } from "@/components/Livestock/LivestockActionForm";
 import { LivestockHistory } from "@/components/Livestock/LivestockHistory";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const LivestockScreen = () => {
     const { data: fields, isLoading } = useMyFields();
@@ -64,7 +65,9 @@ export const LivestockScreen = () => {
                     </div>
 
                     {/* 3. History List - Full Width */}
-                    <LivestockHistory />
+                    <ErrorBoundary>
+                        <LivestockHistory />
+                    </ErrorBoundary>
                 </div>
             </div>
         </CommonLayout>
