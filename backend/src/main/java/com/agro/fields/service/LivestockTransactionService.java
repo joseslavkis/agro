@@ -115,6 +115,158 @@ public class LivestockTransactionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public LivestockTransactionResponseDTO updateTransaction(Long transactionId, Long userId,
+            LivestockTransactionCreateDTO dto) {
+        LivestockTransaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // Revert old transaction effect
+        // If it was an action that INCREASED stock on target, we DECREASE it.
+        // If it was an action that DECREASED stock on source, we INCREASE it.
+        Field sourceField = transaction.getSourceField();
+        Field targetField = transaction.getTargetField();
+        Integer oldQty = transaction.getQuantity();
+        LivestockCategory oldCategory = transaction.getCategory();
+
+        // Revert logic
+        switch (transaction.getActionType()) {
+            case BIRTH:
+            case PURCHASE:
+                // Originally increased target. Revert by decreasing target.
+                if (targetField != null) {
+                    decreaseStock(targetField, oldCategory, oldQty);
+                    fieldRepository.save(targetField);
+                }
+                break;
+            case DEATH:
+            case SALE:
+                // Originally decreased source. Revert by increasing source.
+                if (sourceField != null) {
+                    increaseStock(sourceField, oldCategory, oldQty);
+                    fieldRepository.save(sourceField);
+                }
+                break;
+            case MOVE:
+                // Originally decreased source, increased target.
+                // Revert: increase source, decrease target.
+                if (sourceField != null) {
+                    increaseStock(sourceField, oldCategory, oldQty);
+                    fieldRepository.save(sourceField);
+                }
+                if (targetField != null) {
+                    decreaseStock(targetField, oldCategory, oldQty);
+                    fieldRepository.save(targetField);
+                }
+                break;
+        }
+
+        // Now apply NEW transaction details
+        // Note: For simplicity, we assume Source/Target fields CANNOT be changed in an
+        // update, only Quantity/Date/Notes/Category.
+        // If Source/Target needed to change, it would require re-fetching fields.
+        // Let's assume for now the user is fixing a mistake in numbers or date.
+        // If they want to change the FIELD, they should delete and re-create.
+
+        // Update basic fields
+        transaction.setQuantity(dto.getQuantity());
+        transaction.setDate(dto.getDate());
+        transaction.setNotes(dto.getNotes());
+        transaction.setCategory(dto.getCategory());
+        // Note: Changing category also requires re-applying stock logic to the NEW
+        // category.
+
+        Integer newQty = dto.getQuantity();
+        LivestockCategory newCategory = dto.getCategory();
+
+        // Apply new logic
+        switch (transaction.getActionType()) {
+            case BIRTH:
+            case PURCHASE:
+                if (targetField != null) {
+                    increaseStock(targetField, newCategory, newQty);
+                    fieldRepository.save(targetField);
+                    saveHistory(targetField);
+                }
+                break;
+            case DEATH:
+            case SALE:
+                if (sourceField != null) {
+                    decreaseStock(sourceField, newCategory, newQty);
+                    fieldRepository.save(sourceField);
+                    saveHistory(sourceField);
+                }
+                break;
+            case MOVE:
+                if (sourceField != null) {
+                    decreaseStock(sourceField, newCategory, newQty);
+                    fieldRepository.save(sourceField);
+                    saveHistory(sourceField);
+                }
+                if (targetField != null) {
+                    increaseStock(targetField, newCategory, newQty);
+                    fieldRepository.save(targetField);
+                    saveHistory(targetField);
+                }
+                break;
+        }
+
+        return mapToDTO(transactionRepository.save(transaction));
+    }
+
+    @Transactional
+    public void deleteTransaction(Long transactionId, Long userId) {
+        LivestockTransaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        Field sourceField = transaction.getSourceField();
+        Field targetField = transaction.getTargetField();
+        Integer quantity = transaction.getQuantity();
+        LivestockCategory category = transaction.getCategory();
+
+        // Revert effect before deleting
+        switch (transaction.getActionType()) {
+            case BIRTH:
+            case PURCHASE:
+                if (targetField != null) {
+                    decreaseStock(targetField, category, quantity);
+                    fieldRepository.save(targetField);
+                    saveHistory(targetField);
+                }
+                break;
+            case DEATH:
+            case SALE:
+                if (sourceField != null) {
+                    increaseStock(sourceField, category, quantity);
+                    fieldRepository.save(sourceField);
+                    saveHistory(sourceField);
+                }
+                break;
+            case MOVE:
+                if (sourceField != null) {
+                    increaseStock(sourceField, category, quantity);
+                    fieldRepository.save(sourceField);
+                    saveHistory(sourceField);
+                }
+                if (targetField != null) {
+                    decreaseStock(targetField, category, quantity);
+                    fieldRepository.save(targetField);
+                    saveHistory(targetField);
+                }
+                break;
+        }
+
+        transactionRepository.delete(transaction);
+    }
+
     private void increaseStock(Field field, LivestockCategory category, int amount) {
         switch (category) {
             case COWS:

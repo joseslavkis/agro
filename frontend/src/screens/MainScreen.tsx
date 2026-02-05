@@ -309,8 +309,8 @@ export const MainScreen = () => {
                   <div style={{ height: '300px', width: '100%', borderRadius: '0.5rem', overflow: 'hidden' }}>
                     <MapContainer center={[-34.6, -58.4]} zoom={5} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                       <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='Map data &copy; Google'
+                        url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
                       />
                       <LocationMarker
                         position={formData.latitude !== null && formData.longitude !== null ? { lat: formData.latitude, lng: formData.longitude! } : null}
