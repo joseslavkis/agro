@@ -35,19 +35,14 @@ public class FieldController {
 
     @PostMapping
     public ResponseEntity<FieldResponseDTO> createField(@AuthenticationPrincipal User user,
-            @RequestPart("field") FieldCreateDTO createDTO,
+            @jakarta.validation.Valid @RequestPart("field") FieldCreateDTO createDTO,
             @RequestPart(value = "image", required = false) org.springframework.web.multipart.MultipartFile image) {
-        try {
-            System.out.println("Received createField request for: " + createDTO.getName());
-            if (user == null) {
-                System.out.println("User is null! Request was allowed publicly but no user context found.");
-                return ResponseEntity.status(401).build();
-            }
-            return ResponseEntity.ok(fieldService.createField(user.getId(), createDTO, image));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error creating field: " + e.getMessage());
+        System.out.println("Received createField request for: " + createDTO.getName());
+        if (user == null) {
+            System.out.println("User is null! Request was allowed publicly but no user context found.");
+            return ResponseEntity.status(401).build();
         }
+        return ResponseEntity.ok(fieldService.createField(user.getId(), createDTO, image));
     }
 
     @DeleteMapping("/{id}")
@@ -69,7 +64,7 @@ public class FieldController {
 
     @PutMapping("/{id}")
     public ResponseEntity<FieldResponseDTO> updateField(@AuthenticationPrincipal User user, @PathVariable Long id,
-            @RequestBody FieldCreateDTO updateDTO) {
+            @jakarta.validation.Valid @RequestBody FieldCreateDTO updateDTO) {
         return ResponseEntity.ok(fieldService.updateField(user.getId(), id, updateDTO));
     }
 

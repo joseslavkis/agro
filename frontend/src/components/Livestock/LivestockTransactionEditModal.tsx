@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { LivestockCategory, CategoryLabels, ActionLabels, LivestockTransactionResponse, LivestockTransactionCreate } from "@/models/Livestock";
 import { useUpdateLivestockTransaction, useDeleteLivestockTransaction } from "@/services/LivestockService";
+import { ConfirmationModal } from "@/components/Common/ConfirmationModal";
 import styles from "./Livestock.module.css";
 
 interface LivestockTransactionEditModalProps {
@@ -12,6 +13,7 @@ interface LivestockTransactionEditModalProps {
 export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditModalProps> = ({ transaction, onClose }) => {
     const updateMutation = useUpdateLivestockTransaction();
     const deleteMutation = useDeleteLivestockTransaction();
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const [formData, setFormData] = useState<LivestockTransactionCreate>({
         sourceFieldId: transaction.sourceFieldId,
@@ -34,15 +36,19 @@ export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditMod
         }
     };
 
-    const handleDelete = async () => {
-        if (confirm("¿Está seguro que desea eliminar este movimiento? Esto revertirá los cambios en el stock.")) {
-            try {
-                await deleteMutation.mutateAsync(transaction.id);
-                onClose();
-            } catch (error) {
-                console.error(error);
-                alert("Error al eliminar la transacción");
-            }
+    const handleDeleteClick = () => {
+        setShowDeleteConfirm(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            await deleteMutation.mutateAsync(transaction.id);
+            onClose();
+        } catch (error) {
+            console.error(error);
+            alert("Error al eliminar la transacción");
+        } finally {
+            setShowDeleteConfirm(false);
         }
     };
 
@@ -112,7 +118,7 @@ export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditMod
                         <button
                             type="button"
                             className={styles.deleteButton}
-                            onClick={handleDelete}
+                            onClick={handleDeleteClick}
                         >
                             Eliminar
                         </button>
@@ -135,6 +141,15 @@ export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditMod
                     </div>
                 </form>
             </div>
+
+            <ConfirmationModal
+                isOpen={showDeleteConfirm}
+                title="¿Eliminar movimiento?"
+                message="Esta acción no se puede deshacer. El movimiento se eliminará y se revertirán los cambios en el stock del campo."
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setShowDeleteConfirm(false)}
+                isProcessing={deleteMutation.isPending}
+            />
         </div>,
         document.body
     );
