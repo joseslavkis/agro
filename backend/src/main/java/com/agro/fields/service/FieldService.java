@@ -66,6 +66,10 @@ public class FieldService {
             photo = saveImage(image);
         }
 
+        if (createDTO.getHectares() <= 0) {
+            throw new RuntimeException("Hectares must be greater than 0");
+        }
+
         if (photo == null && (createDTO.getPhoto() == null || createDTO.getPhoto().trim().isEmpty())) {
             photo = DEFAULT_PHOTOS.get((int) (Math.random() * DEFAULT_PHOTOS.size()));
         } else if (photo == null) {
@@ -134,6 +138,10 @@ public class FieldService {
             throw new RuntimeException("Unauthorized access to field");
         }
 
+        if (updateDTO.getHectares() <= 0) {
+            throw new RuntimeException("Hectares must be greater than 0");
+        }
+
         if (updateDTO.getName() != null)
             field.setName(updateDTO.getName());
         if (updateDTO.getHectares() != null)
@@ -146,11 +154,6 @@ public class FieldService {
             field.setLatitude(updateDTO.getLatitude());
         if (updateDTO.getLongitude() != null)
             field.setLongitude(updateDTO.getLongitude());
-
-        // Livestock counts are NOT updated here anymore.
-        // They must be updated via LivestockTransactionService.
-
-        // Also removing history save here, as history is strictly transactional now.
 
         Field updatedField = fieldRepository.save(field);
         return mapToDTO(updatedField);
