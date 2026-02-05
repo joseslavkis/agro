@@ -141,9 +141,35 @@ export const MainScreen = () => {
         femaleCalves: formData.femaleCalves,
       });
       handleCloseModal();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Error al crear el campo. Intente nuevamente.");
+      let errorMessage = "Error al crear el campo. Intente nuevamente.";
+
+      // Try to extract detailed message from the error object
+      if (err.message && err.message.includes("400")) {
+        try {
+          // The error string format is "Error creating field: 400 {json}"
+          // We try to find the starting brace of the JSON
+          const jsonStart = err.message.indexOf('{');
+          if (jsonStart !== -1) {
+            const jsonStr = err.message.substring(jsonStart);
+            const data = JSON.parse(jsonStr);
+
+            // Spring Boot Validation Errors usually come in 'errors' array
+            if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+              errorMessage = data.errors[0].defaultMessage || errorMessage;
+            }
+            // Or sometimes directly in message field
+            else if (data.message) {
+              errorMessage = data.message;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse error response", e);
+        }
+      }
+
+      setError(errorMessage);
     }
   };
 
@@ -309,8 +335,8 @@ export const MainScreen = () => {
                   <div style={{ height: '300px', width: '100%', borderRadius: '0.5rem', overflow: 'hidden' }}>
                     <MapContainer center={[-34.6, -58.4]} zoom={5} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                       <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='Map data &copy; Google'
+                        url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
                       />
                       <LocationMarker
                         position={formData.latitude !== null && formData.longitude !== null ? { lat: formData.latitude, lng: formData.longitude! } : null}

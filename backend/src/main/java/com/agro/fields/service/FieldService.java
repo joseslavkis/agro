@@ -147,26 +147,10 @@ public class FieldService {
         if (updateDTO.getLongitude() != null)
             field.setLongitude(updateDTO.getLongitude());
 
-        if (updateDTO.getCows() != null)
-            field.setCows(updateDTO.getCows());
-        if (updateDTO.getBulls() != null)
-            field.setBulls(updateDTO.getBulls());
-        if (updateDTO.getSteers() != null)
-            field.setSteers(updateDTO.getSteers());
-        if (updateDTO.getYoungSteers() != null)
-            field.setYoungSteers(updateDTO.getYoungSteers());
-        if (updateDTO.getHeifers() != null)
-            field.setHeifers(updateDTO.getHeifers());
-        if (updateDTO.getMaleCalves() != null)
-            field.setMaleCalves(updateDTO.getMaleCalves());
-        if (updateDTO.getFemaleCalves() != null)
-            field.setFemaleCalves(updateDTO.getFemaleCalves());
+        // Livestock counts are NOT updated here anymore.
+        // They must be updated via LivestockTransactionService.
 
-        // Save history
-        LivestockHistory history = new LivestockHistory(field, java.time.LocalDate.now(),
-                field.getCows(), field.getBulls(), field.getSteers(), field.getYoungSteers(),
-                field.getHeifers(), field.getMaleCalves(), field.getFemaleCalves());
-        livestockHistoryRepository.save(history);
+        // Also removing history save here, as history is strictly transactional now.
 
         Field updatedField = fieldRepository.save(field);
         return mapToDTO(updatedField);

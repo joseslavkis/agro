@@ -44,6 +44,8 @@ import { useMyFields } from "@/services/FieldServices";
 const LoggedInLinks = () => {
   const [, setTokenState] = useToken();
   const { data: fields } = useMyFields();
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLLIElement>(null);
 
   const hasLivestock = fields?.some(field => field.hasLivestock);
 
@@ -51,22 +53,66 @@ const LoggedInLinks = () => {
     setTokenState({ state: "LOGGED_OUT" });
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
   return (
-    <>
-      <li>
-        <Link href="/">Mis Campos</Link>
-      </li>
-      {hasLivestock && (
-        <li>
-          <Link href="/livestock">Ganadería</Link>
-        </li>
+    <li className={styles.burgerWrapper} ref={menuRef}>
+      <button
+        className={styles.burgerButton}
+        onClick={toggleMenu}
+        aria-label="Menu"
+        aria-expanded={isMenuOpen}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      {isMenuOpen && (
+        <div className={styles.dropdownMenu}>
+          <Link href="/" onClick={() => setIsMenuOpen(false)} className={styles.dropdownItem}>
+            Mis Campos
+          </Link>
+          {hasLivestock && (
+            <Link href="/livestock" onClick={() => setIsMenuOpen(false)} className={styles.dropdownItem}>
+              Ganadería
+            </Link>
+          )}
+          <Link href="/partners" onClick={() => setIsMenuOpen(false)} className={styles.dropdownItem}>
+            Socios
+          </Link>
+          <button onClick={logOut} className={`${styles.dropdownItem} ${styles.logoutButton}`}>
+            Cerrar Sesión
+          </button>
+        </div>
       )}
-      <li>
-        <Link href="/partners">Socios</Link>
-      </li>
-      <li>
-        <button onClick={logOut}>Cerrar Sesión</button>
-      </li>
-    </>
+    </li>
   );
 };
