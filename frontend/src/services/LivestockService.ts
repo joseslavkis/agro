@@ -61,3 +61,63 @@ export function useCreateLivestockTransaction() {
         },
     });
 }
+
+export function useUpdateLivestockTransaction() {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number, data: LivestockTransactionCreate }) => {
+            if (!token) throw new Error("Not logged in");
+
+            const response = await fetch(`${BASE_API_URL}/api/v1/livestock/transaction/${id}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Error updating transaction: ${response.status} ${text}`);
+            }
+
+            return LivestockTransactionResponseSchema.parse(await response.json());
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["fields"] });
+            queryClient.invalidateQueries({ queryKey: ["livestock_transactions"] });
+        },
+    });
+}
+
+export function useDeleteLivestockTransaction() {
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: number) => {
+            if (!token) throw new Error("Not logged in");
+
+            const response = await fetch(`${BASE_API_URL}/api/v1/livestock/transaction/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Error deleting transaction: ${response.status} ${text}`);
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["fields"] });
+            queryClient.invalidateQueries({ queryKey: ["livestock_transactions"] });
+        },
+    });
+}

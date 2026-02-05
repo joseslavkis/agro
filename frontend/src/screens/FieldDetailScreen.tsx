@@ -43,6 +43,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
     const [weatherLoading, setWeatherLoading] = useState(false);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [formError, setFormError] = useState<string | null>(null);
 
     const [editFormData, setEditFormData] = useState<{
         name: string;
@@ -101,6 +102,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 maleCalves: field.maleCalves ?? 0,
                 femaleCalves: field.femaleCalves ?? 0,
             });
+            setFormError(null);
             setIsEditModalOpen(true);
         }
     };
@@ -127,9 +129,29 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                 }
             });
             setIsEditModalOpen(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating field:", error);
-            alert("Error al actualizar el campo");
+            let errorMessage = "Error al actualizar el campo";
+
+            // Try to parse validation error
+            if (error.message && error.message.includes("400")) {
+                try {
+                    const jsonStart = error.message.indexOf('{');
+                    if (jsonStart !== -1) {
+                        const jsonStr = error.message.substring(jsonStart);
+                        const data = JSON.parse(jsonStr);
+                        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+                            errorMessage = data.errors[0].defaultMessage || errorMessage;
+                        } else if (data.message) {
+                            errorMessage = data.message;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Parsing error failed", e);
+                }
+            }
+
+            setFormError(errorMessage);
         }
     };
 
@@ -200,14 +222,27 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                     <h3 className={styles.cardTitle} style={{ marginBottom: 0, borderBottom: 'none' }}>Ganadería ({((field.cows || 0) + (field.bulls || 0) + (field.steers || 0) + (field.youngSteers || 0) + (field.heifers || 0) + (field.maleCalves || 0) + (field.femaleCalves || 0))})</h3>
                                     <span style={{ fontSize: '0.9rem', color: '#60a5fa' }}>Ver Detalle →</span>
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', color: '#cbd5e1' }}>
-                                    <div className={styles.infoRow}>Vacas: {field.cows || 0}</div>
-                                    <div className={styles.infoRow}>Toros: {field.bulls || 0}</div>
-                                    <div className={styles.infoRow}>Novillos: {field.steers || 0}</div>
-                                    <div className={styles.infoRow}>Novillitos: {field.youngSteers || 0}</div>
-                                    <div className={styles.infoRow}>Vaquillonas: {field.heifers || 0}</div>
-                                    <div className={styles.infoRow}>Terneros: {field.maleCalves || 0}</div>
-                                    <div className={styles.infoRow}>Terneras: {field.femaleCalves || 0}</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.8rem', marginTop: '1rem' }}>
+                                    {[
+                                        { label: 'Vacas', value: field.cows },
+                                        { label: 'Toros', value: field.bulls },
+                                        { label: 'Novillos', value: field.steers },
+                                        { label: 'Novillitos', value: field.youngSteers },
+                                        { label: 'Vaquillonas', value: field.heifers },
+                                        { label: 'Terneros', value: field.maleCalves },
+                                        { label: 'Terneras', value: field.femaleCalves },
+                                    ].map((item, index) => (
+                                        <div key={index} style={{
+                                            background: 'rgba(255, 255, 255, 0.03)',
+                                            borderRadius: '0.5rem',
+                                            padding: '0.8rem',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            textAlign: 'center'
+                                        }}>
+                                            <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.2rem' }}>{item.label}</div>
+                                            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#f8fafc' }}>{item.value || 0}</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </a>
                         </Link>
@@ -263,8 +298,8 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                             <div className={styles.mapContainer}>
                                 <MapContainer center={[field.latitude, field.longitude]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                                     <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='Map data &copy; Google'
+                                        url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
                                     />
                                     <Marker position={[field.latitude, field.longitude]}>
                                         <Popup>
@@ -329,38 +364,17 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                 </div>
 
                                 {editFormData.hasLivestock && (
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Inventario Ganadero</label>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Vacas</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.cows} onChange={(e) => setEditFormData({ ...editFormData, cows: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Toros</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.bulls} onChange={(e) => setEditFormData({ ...editFormData, bulls: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Novillos</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.steers} onChange={(e) => setEditFormData({ ...editFormData, steers: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Novillitos</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.youngSteers} onChange={(e) => setEditFormData({ ...editFormData, youngSteers: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Vaquillonas</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.heifers} onChange={(e) => setEditFormData({ ...editFormData, heifers: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Terneros</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.maleCalves} onChange={(e) => setEditFormData({ ...editFormData, maleCalves: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                            <div>
-                                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>Terneras</label>
-                                                <input className={styles.input} type="number" min="0" value={editFormData.femaleCalves} onChange={(e) => setEditFormData({ ...editFormData, femaleCalves: parseInt(e.target.value) || 0 })} />
-                                            </div>
-                                        </div>
+                                    <div style={{
+                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                        padding: '1rem',
+                                        borderRadius: '0.5rem',
+                                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                                        margin: '1rem 0'
+                                    }}>
+                                        <p style={{ color: '#93c5fd', margin: 0, fontSize: '0.9rem' }}>
+                                            ℹ️ Para modificar el stock (Nacimientos, Mortandad, Movimientos), por favor utilice la sección de
+                                            <Link href="/livestock"><strong> Ganadería General</strong></Link>.
+                                        </p>
                                     </div>
                                 )}
 
@@ -369,8 +383,8 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                     <div style={{ height: '300px', width: '100%', borderRadius: '0.5rem', overflow: 'hidden' }}>
                                         <MapContainer center={editFormData.latitude ? [editFormData.latitude, editFormData.longitude!] : [-34.6, -58.4]} zoom={editFormData.latitude ? 13 : 5} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                                             <TileLayer
-                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                attribution='Map data &copy; Google'
+                                                url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
                                             />
                                             <LocationMarker
                                                 position={editFormData.latitude !== null && editFormData.longitude !== null ? { lat: editFormData.latitude, lng: editFormData.longitude! } : null}
@@ -379,6 +393,12 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                         </MapContainer>
                                     </div>
                                 </div>
+
+                                {formError && (
+                                    <div style={{ color: "#ff6b6b", marginBottom: "1rem", backgroundColor: 'rgba(255, 107, 107, 0.1)', padding: '0.5rem', borderRadius: '0.5rem' }}>
+                                        {formError}
+                                    </div>
+                                )}
 
                                 <div className={styles.modalActions}>
                                     <button

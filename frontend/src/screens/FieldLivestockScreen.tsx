@@ -52,21 +52,22 @@ export const FieldLivestockScreen = ({ id }: { id: number }) => {
                     </div>
                 </header>
 
-                <div className={styles.dashboardGrid}>
+                <div className={styles.dashboardGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
                     {/* Total Card */}
                     <div className={styles.card} onClick={() => {
                         setSelectedAnimal('total');
-                    }} style={{ cursor: 'pointer', border: '2px solid #3b82f6' }}>
-                        <h3 className={styles.cardTitle}>Cabezas Totales</h3>
-                        <div className={styles.statValue} style={{ fontSize: '3rem', color: '#3b82f6' }}>
+                    }} style={{ cursor: 'pointer', border: '2px solid #3b82f6', padding: '1rem', minHeight: 'auto' }}>
+                        <h3 className={styles.cardTitle} style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Cabezas Totales</h3>
+                        <div className={styles.statValue} style={{ fontSize: '2rem', color: '#3b82f6' }}>
                             {totalHeads}
                         </div>
                     </div>
 
                     {animalTypes.map(type => (
-                        <div key={type.key} className={styles.card} onClick={() => handleCardClick(type.key)} style={{ cursor: 'pointer' }}>
-                            <h3 className={styles.cardTitle}>{type.label}</h3>
-                            <div className={styles.statValue}>
+                        <div key={type.key} className={styles.card} onClick={() => handleCardClick(type.key)}
+                            style={{ cursor: 'pointer', padding: '1rem', minHeight: 'auto' }}>
+                            <h3 className={styles.cardTitle} style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{type.label}</h3>
+                            <div className={styles.statValue} style={{ fontSize: '1.5rem' }}>
                                 {field[type.key as keyof typeof field] || 0}
                             </div>
                         </div>
@@ -92,14 +93,17 @@ export const FieldLivestockScreen = ({ id }: { id: number }) => {
                                         <YAxis stroke="#94a3b8" />
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155' }}
-                                            itemStyle={{ color: '#f8fafc' }}
+                                            labelStyle={{ color: '#cbd5e1' }}
+                                            formatter={(value: any) => [`${value} Cabezas`, 'Stock']}
                                         />
                                         <Line
                                             type="monotone"
                                             dataKey={selectedAnimal === 'total' ? 'total' : 'count'}
                                             stroke="#3b82f6"
                                             strokeWidth={3}
-                                            dot={{ fill: '#3b82f6' }}
+                                            dot={{ r: 4, fill: '#1e293b', stroke: '#3b82f6', strokeWidth: 2 }}
+                                            activeDot={{ r: 6, fill: '#60a5fa' }}
+                                            animationDuration={500}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
