@@ -25,7 +25,12 @@ export const LivestockTransactionCreateSchema = z.object({
     sourceFieldId: z.number().optional().nullable(),
     targetFieldId: z.number().optional().nullable(),
     date: z.string(), // ISO Date
-    notes: z.string().optional()
+    notes: z.string().optional(),
+    // Financial fields
+    pricePerUnit: z.number().optional().nullable(),
+    currency: z.enum(['USD', 'ARS']).optional(),
+    exchangeRate: z.number().optional().nullable(),
+    salvageValue: z.number().optional().nullable(),
 });
 
 export type LivestockTransactionCreate = z.infer<typeof LivestockTransactionCreateSchema>;
@@ -40,7 +45,16 @@ export const LivestockTransactionResponseSchema = z.object({
     targetFieldId: z.number().nullable(),
     targetFieldName: z.string().nullable(),
     date: z.string(),
-    notes: z.string().nullable()
+    notes: z.string().nullable(),
+    // Financial fields
+    pricePerUnit: z.number().nullable(),
+    currency: z.string().nullable(),
+    exchangeRate: z.number().nullable(),
+    pricePerUnitUSD: z.number().nullable(),
+    totalValueUSD: z.number().nullable(),
+    salvageValue: z.number().nullable(),
+    salvageValueUSD: z.number().nullable(),
+    agendaEventId: z.number().nullable(),
 });
 
 export type LivestockTransactionResponse = z.infer<typeof LivestockTransactionResponseSchema>;
