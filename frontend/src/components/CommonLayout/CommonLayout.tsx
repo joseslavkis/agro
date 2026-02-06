@@ -108,6 +108,9 @@ const LoggedInLinks = () => {
           <Link href="/partners" onClick={() => setIsMenuOpen(false)} className={styles.dropdownItem}>
             Socios
           </Link>
+          <Link href="/agenda" onClick={() => setIsMenuOpen(false)} className={styles.dropdownItem}>
+            Agenda y Calendario
+          </Link>
           <button onClick={logOut} className={`${styles.dropdownItem} ${styles.logoutButton}`}>
             Cerrar Sesión
           </button>

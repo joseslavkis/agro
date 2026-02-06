@@ -2,6 +2,7 @@ package com.agro.fields.dto;
 
 public class FieldCreateDTO {
     private String name;
+    @jakarta.validation.constraints.Min(value = 0, message = "Las hectáreas deben ser mayor a 0")
     private Double hectares;
     private String photo;
 

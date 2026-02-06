@@ -12,6 +12,7 @@ import { WeatherDashboardScreen } from "@/screens/WeatherDashboardScreen";
 
 import { LivestockScreen } from "@/screens/LivestockScreen";
 import { FieldLivestockScreen } from "@/screens/FieldLivestockScreen";
+import { AgendaScreen } from "@/screens/AgendaScreen";
 
 export const Navigation = () => {
   const [tokenState] = useToken();
@@ -36,6 +37,9 @@ export const Navigation = () => {
           </Route>
           <Route path="/fields/:id/livestock">
             {(params) => <FieldLivestockScreen id={Number(params.id)} />}
+          </Route>
+          <Route path="/agenda">
+            <AgendaScreen />
           </Route>
           <Route>
             <Redirect href="/" />

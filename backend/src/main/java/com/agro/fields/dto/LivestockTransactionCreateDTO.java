@@ -2,6 +2,7 @@ package com.agro.fields.dto;
 
 import com.agro.fields.model.LivestockActionType;
 import com.agro.fields.model.LivestockCategory;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class LivestockTransactionCreateDTO {
@@ -12,6 +13,12 @@ public class LivestockTransactionCreateDTO {
     private Long targetFieldId;
     private LocalDate date;
     private String notes;
+
+    // Financial fields
+    private BigDecimal pricePerUnit;
+    private String currency = "USD";
+    private BigDecimal exchangeRate;
+    private BigDecimal salvageValue;
 
     public LivestockActionType getActionType() {
         return actionType;
@@ -67,5 +74,37 @@ public class LivestockTransactionCreateDTO {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public BigDecimal getPricePerUnit() {
+        return pricePerUnit;
+    }
+
+    public void setPricePerUnit(BigDecimal pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(BigDecimal exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public BigDecimal getSalvageValue() {
+        return salvageValue;
+    }
+
+    public void setSalvageValue(BigDecimal salvageValue) {
+        this.salvageValue = salvageValue;
     }
 }

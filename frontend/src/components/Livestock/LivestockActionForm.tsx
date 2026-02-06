@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import detailStyles from "@/screens/FieldDetailScreen.module.css";
 import { LivestockActionType, LivestockCategory, CategoryLabels, LivestockTransactionCreate, ActionLabels } from "@/models/Livestock";
-import { useCreateLivestockTransaction } from "@/services/LivestockService";
+import { useCreateLivestockTransaction, useLivestockTransactions } from "@/services/LivestockService";
 
 interface LivestockActionFormProps {
     fields: any[]; // User's fields
@@ -11,6 +11,7 @@ interface LivestockActionFormProps {
 
 export const LivestockActionForm = ({ fields }: LivestockActionFormProps) => {
     const { mutateAsync: createTransaction, isPending } = useCreateLivestockTransaction();
+    const { data: transactions } = useLivestockTransactions();
     const [isOpen, setIsOpen] = useState(false);
 
     const [actionType, setActionType] = useState<LivestockActionType>(LivestockActionType.BIRTH);
@@ -19,6 +20,28 @@ export const LivestockActionForm = ({ fields }: LivestockActionFormProps) => {
     const [category, setCategory] = useState<LivestockCategory>(LivestockCategory.MALE_CALVES);
     const [quantity, setQuantity] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
+    // Financial fields
+    const [currency, setCurrency] = useState<'USD' | 'ARS'>('USD');
+    const [pricePerUnit, setPricePerUnit] = useState<string>("");
+    const [salvageValue, setSalvageValue] = useState<string>("");
+    const [autoFilledPrice, setAutoFilledPrice] = useState(false);
+
+    // Auto-fill price for DEATH based on last purchase (FIFO method)
+    useEffect(() => {
+        if (actionType === LivestockActionType.DEATH && category && transactions) {
+            const lastPurchase = transactions
+                .filter((t: any) => t.actionType === 'PURCHASE' && t.category === category && t.pricePerUnitUSD)
+                .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+
+            if (lastPurchase && lastPurchase.pricePerUnitUSD && !pricePerUnit) {
+                setPricePerUnit(lastPurchase.pricePerUnitUSD.toString());
+                setCurrency('USD');
+                setAutoFilledPrice(true);
+            }
+        } else if (actionType !== LivestockActionType.DEATH) {
+            setAutoFilledPrice(false);
+        }
+    }, [actionType, category, transactions, pricePerUnit]);
 
     // Filter fields that have livestock enabled
     const livestockFields = fields.filter(f => f.hasLivestock);
@@ -49,11 +72,23 @@ export const LivestockActionForm = ({ fields }: LivestockActionFormProps) => {
                 payload.sourceFieldId = parseInt(sourceFieldId);
             }
 
+            // Add financial fields if present
+            if (pricePerUnit) {
+                payload.pricePerUnit = parseFloat(pricePerUnit);
+                payload.currency = currency;
+            }
+            if (salvageValue && actionType === LivestockActionType.DEATH) {
+                payload.salvageValue = parseFloat(salvageValue);
+            }
+
             await createTransaction(payload);
 
             // Reset form and close
             setQuantity("");
             setNotes("");
+            setPricePerUnit("");
+            setSalvageValue("");
+            setCurrency('USD');
             setIsOpen(false);
             toast.success("Operación registrada correctamente");
         } catch (error: any) {
@@ -81,7 +116,7 @@ export const LivestockActionForm = ({ fields }: LivestockActionFormProps) => {
                 }}
                 onClick={() => setIsOpen(true)}
             >
-                <div style={{ fontSize: '3rem', marginBottom: '0.5rem', filter: 'drop-shadow(0 0 15px rgba(250, 204, 21, 0.4))' }}>⚡</div>
+                <div style={{ fontSize: '3rem', marginBottom: '0.5rem', filter: 'drop-shadow(0 0 15px rgba(250, 204, 21, 0.4))' }}>🐄</div>
                 <h3 className={detailStyles.cardTitle} style={{ margin: 0, borderBottom: 'none' }}>Registrar Movimiento</h3>
                 <p style={{ color: '#93c5fd', textAlign: 'center', fontSize: '0.95rem', marginTop: '0.5rem' }}>
                     Nacimientos, bajas, traslados...
@@ -165,6 +200,70 @@ export const LivestockActionForm = ({ fields }: LivestockActionFormProps) => {
                             required
                         />
                     </div>
+
+                    {/* Financial fields - only for PURCHASE, SALE, DEATH */}
+                    {[LivestockActionType.PURCHASE, LivestockActionType.SALE, LivestockActionType.DEATH].includes(actionType) && (
+                        <>
+                            <div className={detailStyles.inputGroup}>
+                                <label className={detailStyles.label}>Moneda</label>
+                                <select className={detailStyles.input} value={currency} onChange={e => setCurrency(e.target.value as 'USD' | 'ARS')}>
+                                    <option value="USD">Dólares (USD)</option>
+                                    <option value="ARS">Pesos (ARS)</option>
+                                </select>
+                            </div>
+
+                            <div className={detailStyles.inputGroup}>
+                                <label className={detailStyles.label}>
+                                    Precio por unidad ({currency}) - Opcional
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    className={detailStyles.input}
+                                    value={pricePerUnit}
+                                    onChange={e => {
+                                        setPricePerUnit(e.target.value);
+                                        setAutoFilledPrice(false);
+                                    }}
+                                    placeholder="0.00"
+                                />
+                                {actionType === LivestockActionType.DEATH && autoFilledPrice && (
+                                    <small style={{ color: '#10b981', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block' }}>
+                                        ✓ Precio de última compra
+                                    </small>
+                                )}
+                            </div>
+
+                            {actionType === LivestockActionType.DEATH && (
+                                <div className={detailStyles.inputGroup}>
+                                    <label className={detailStyles.label}>
+                                        Valor de rescate ({currency}) - Opcional
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        className={detailStyles.input}
+                                        value={salvageValue}
+                                        onChange={e => setSalvageValue(e.target.value)}
+                                        placeholder="0.00"
+                                    />
+                                    <small style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block' }}>
+                                        Valor recuperado (venta de carne)
+                                    </small>
+                                </div>
+                            )}
+
+                            {currency === 'ARS' && pricePerUnit && (
+                                <div style={{ padding: '0.75rem', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '0.5rem', gridColumn: '1 / -1' }}>
+                                    <small style={{ color: '#93c5fd' }}>
+                                        💱 Se convertirá automáticamente a USD usando cotización oficial
+                                    </small>
+                                </div>
+                            )}
+                        </>
+                    )}
 
                     {/* Notes (Full width) */}
                     <div className={detailStyles.inputGroup} style={{ gridColumn: '1 / -1' }}>
