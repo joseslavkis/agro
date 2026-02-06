@@ -61,7 +61,7 @@ export const LivestockScreen = () => {
 
                         {/* 2. Financial Summary */}
                         <div style={{ height: '100%' }}>
-                            <FinancialSummary fields={livestockFields} />
+                            <FinancialSummary />
                         </div>
 
                         {/* 3. Action Form */}
