@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import { LivestockSummary } from "@/components/Livestock/LivestockSummary";
 import { LivestockActionForm } from "@/components/Livestock/LivestockActionForm";
 import { LivestockHistory } from "@/components/Livestock/LivestockHistory";
+import { FinancialSummary } from "@/components/Livestock/FinancialSummary";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const LivestockScreen = () => {
@@ -58,7 +59,12 @@ export const LivestockScreen = () => {
                             <LivestockSummary fields={livestockFields} />
                         </div>
 
-                        {/* 2. Action Form */}
+                        {/* 2. Financial Summary */}
+                        <div style={{ height: '100%' }}>
+                            <FinancialSummary fields={livestockFields} />
+                        </div>
+
+                        {/* 3. Action Form */}
                         <div style={{ height: '100%' }}>
                             <LivestockActionForm fields={livestockFields} />
                         </div>

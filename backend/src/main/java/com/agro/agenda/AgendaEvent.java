@@ -37,11 +37,19 @@ public class AgendaEvent {
     private Long fieldId;
 
     public enum EventType {
+        // Existing general types
         VACCINATION,
         SOWING,
         HARVEST,
         GENERAL,
-        TASK
+        TASK,
+
+        // New livestock-specific types
+        PURCHASE, // Animal purchases
+        SALE, // Animal sales
+        LIVESTOCK_BIRTH, // Animal births
+        LIVESTOCK_MOVE, // Movements between fields
+        HEALTH // Health events (including deaths)
     }
 
     public AgendaEvent() {

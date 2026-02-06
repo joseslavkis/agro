@@ -8,7 +8,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
 import { useAgendaEvents, AgendaEvent } from "@/services/AgendaService";
-import { EventModal } from "@/components/Agenda/EventModal";
+import EventModal from "@/components/Agenda/EventModal";
 
 export const AgendaScreen = () => {
     const { data: events } = useAgendaEvents();
