@@ -21,8 +21,13 @@ export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditMod
         category: transaction.category,
         quantity: transaction.quantity,
         actionType: transaction.actionType,
-        date: transaction.date, // This might be a string from API
+        date: transaction.date,
         notes: transaction.notes || "",
+        // Financial fields
+        pricePerUnit: transaction.pricePerUnit || null,
+        currency: transaction.currency as 'USD' | 'ARS' | undefined || 'USD',
+        exchangeRate: transaction.exchangeRate || null,
+        salvageValue: transaction.salvageValue || null,
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -113,6 +118,69 @@ export const LivestockTransactionEditModal: React.FC<LivestockTransactionEditMod
                             rows={3}
                         />
                     </div>
+
+                    {/* Financial fields - only for PURCHASE, SALE, DEATH */}
+                    {['PURCHASE', 'SALE', 'DEATH'].includes(formData.actionType) && (
+                        <>
+                            <div className={styles.inputGroup}>
+                                <label className={styles.label}>Moneda</label>
+                                <select
+                                    className={styles.select}
+                                    value={formData.currency || 'USD'}
+                                    onChange={(e) => setFormData({ ...formData, currency: e.target.value as 'USD' | 'ARS' })}
+                                >
+                                    <option value="USD">Dólares (USD)</option>
+                                    <option value="ARS">Pesos (ARS)</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label className={styles.label}>
+                                    Precio por unidad ({formData.currency === 'ARS' ? 'ARS' : 'USD'})
+                                </label>
+                                <input
+                                    className={styles.input}
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.pricePerUnit || ''}
+                                    onChange={(e) => setFormData({ ...formData, pricePerUnit: parseFloat(e.target.value) || null })}
+                                    placeholder="0.00"
+                                />
+                                <small style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                                    Opcional. Dejar vacío = $0 (sin impacto financiero)
+                                </small>
+                            </div>
+
+                            {formData.actionType === 'DEATH' && (
+                                <div className={styles.inputGroup}>
+                                    <label className={styles.label}>
+                                        Valor de rescate - Carne ({formData.currency === 'ARS' ? 'ARS' : 'USD'})
+                                    </label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.salvageValue || ''}
+                                        onChange={(e) => setFormData({ ...formData, salvageValue: parseFloat(e.target.value) || null })}
+                                        placeholder="0.00"
+                                    />
+                                    <small style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                                        Opcional. Valor recuperado (ej: venta de carne). Reduce la pérdida.
+                                    </small>
+                                </div>
+                            )}
+
+                            {formData.currency === 'ARS' && formData.pricePerUnit && (
+                                <div style={{ padding: '0.75rem', backgroundColor: '#1e293b', borderRadius: '0.5rem', marginTop: '0.5rem' }}>
+                                    <small style={{ color: '#94a3b8' }}>
+                                        💱 Se convertirá automáticamente a USD usando la cotización oficial del día
+                                    </small>
+                                </div>
+                            )}
+                        </>
+                    )}
 
                     <div className={styles.modalActions} style={{ justifyContent: 'space-between' }}>
                         <button

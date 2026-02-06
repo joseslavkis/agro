@@ -2,6 +2,7 @@ package com.agro.fields.model;
 
 import com.agro.user.User;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -43,6 +44,28 @@ public class LivestockTransaction {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    // Financial fields for accounting
+    @Column(precision = 19, scale = 2)
+    private BigDecimal pricePerUnit;
+
+    @Column(length = 3)
+    private String currency = "USD"; // ARS or USD
+
+    @Column(precision = 19, scale = 4)
+    private BigDecimal exchangeRate; // ARS to USD rate if currency is ARS
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal pricePerUnitUSD; // Normalized price in USD
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal salvageValue; // For DEATH transactions
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal salvageValueUSD;
+
+    // Calendar synchronization
+    private Long agendaEventId; // Reference to AgendaEvent
 
     public LivestockTransaction() {
     }
@@ -125,5 +148,61 @@ public class LivestockTransaction {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public BigDecimal getPricePerUnit() {
+        return pricePerUnit;
+    }
+
+    public void setPricePerUnit(BigDecimal pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(BigDecimal exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public BigDecimal getPricePerUnitUSD() {
+        return pricePerUnitUSD;
+    }
+
+    public void setPricePerUnitUSD(BigDecimal pricePerUnitUSD) {
+        this.pricePerUnitUSD = pricePerUnitUSD;
+    }
+
+    public BigDecimal getSalvageValue() {
+        return salvageValue;
+    }
+
+    public void setSalvageValue(BigDecimal salvageValue) {
+        this.salvageValue = salvageValue;
+    }
+
+    public BigDecimal getSalvageValueUSD() {
+        return salvageValueUSD;
+    }
+
+    public void setSalvageValueUSD(BigDecimal salvageValueUSD) {
+        this.salvageValueUSD = salvageValueUSD;
+    }
+
+    public Long getAgendaEventId() {
+        return agendaEventId;
+    }
+
+    public void setAgendaEventId(Long agendaEventId) {
+        this.agendaEventId = agendaEventId;
     }
 }

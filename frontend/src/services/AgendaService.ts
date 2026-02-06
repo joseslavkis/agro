@@ -9,7 +9,18 @@ export const AgendaEventSchema = z.object({
     description: z.string().nullable().optional(),
     startDate: z.string(),
     endDate: z.string(),
-    eventType: z.enum(["VACCINATION", "SOWING", "HARVEST", "GENERAL", "TASK"]),
+    eventType: z.enum([
+        "VACCINATION",
+        "SOWING",
+        "HARVEST",
+        "GENERAL",
+        "TASK",
+        "PURCHASE",
+        "SALE",
+        "LIVESTOCK_BIRTH",
+        "LIVESTOCK_MOVE",
+        "HEALTH"
+    ]),
     fieldId: z.number().nullable().optional(),
 });
 
@@ -20,7 +31,18 @@ export const AgendaCreateSchema = z.object({
     description: z.string().optional(),
     startDate: z.string(),
     endDate: z.string(),
-    eventType: z.enum(["VACCINATION", "SOWING", "HARVEST", "GENERAL", "TASK"]),
+    eventType: z.enum([
+        "VACCINATION",
+        "SOWING",
+        "HARVEST",
+        "GENERAL",
+        "TASK",
+        "PURCHASE",
+        "SALE",
+        "LIVESTOCK_BIRTH",
+        "LIVESTOCK_MOVE",
+        "HEALTH"
+    ]),
     fieldId: z.number().optional().nullable(),
 });
 
@@ -32,7 +54,13 @@ export const EVENT_COLORS: Record<string, string> = {
     SOWING: "#10b981",      // Green
     HARVEST: "#f59e0b",     // Amber
     GENERAL: "#3b82f6",     // Blue
-    TASK: "#8b5cf6"         // Purple
+    TASK: "#8b5cf6",        // Purple
+    // Livestock event colors
+    PURCHASE: "#22c55e",     // Bright Green - Compra
+    SALE: "#ef4444",         // Red - Venta
+    LIVESTOCK_BIRTH: "#06b6d4", // Cyan - Nacimiento
+    LIVESTOCK_MOVE: "#a855f7",  // Purple - Movimiento
+    HEALTH: "#dc2626"        // Dark Red - Salud/Muerte
 };
 
 export const EVENT_LABELS: Record<string, string> = {
@@ -40,7 +68,13 @@ export const EVENT_LABELS: Record<string, string> = {
     SOWING: "Siembra",
     HARVEST: "Cosecha",
     GENERAL: "General",
-    TASK: "Tarea"
+    TASK: "Tarea",
+    // Livestock event types
+    PURCHASE: "Compra de Hacienda",
+    SALE: "Venta de Hacienda",
+    LIVESTOCK_BIRTH: "Nacimiento",
+    LIVESTOCK_MOVE: "Movimiento de Hacienda",
+    HEALTH: "Salud Animal"
 };
 
 export function useAgendaEvents() {

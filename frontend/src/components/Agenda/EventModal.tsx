@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 import { EVENT_LABELS, useCreateEvent, useUpdateEvent, useDeleteEvent, AgendaCreateRequest } from "@/services/AgendaService";
 import { useMyFields } from "@/services/FieldServices";
 
@@ -9,17 +10,21 @@ interface EventModalProps {
     onClose: () => void;
 }
 
+const LIVESTOCK_EVENT_TYPES = ['PURCHASE', 'SALE', 'LIVESTOCK_BIRTH', 'LIVESTOCK_MOVE', 'HEALTH'];
+
 import { ConfirmationModal } from "@/components/Common/ConfirmationModal";
 
-export const EventModal = ({ event, initialDate, onClose }: EventModalProps) => {
-    const isEdit = !!event;
+export default function EventModal({ event, initialDate, onClose }: EventModalProps) {
+    const { data: fields } = useMyFields();
     const { mutateAsync: createEvent, isPending: isCreating } = useCreateEvent();
     const { mutateAsync: updateEvent, isPending: isUpdating } = useUpdateEvent();
     const { mutateAsync: deleteEvent, isPending: isDeleting } = useDeleteEvent();
-    const { data: fields } = useMyFields();
+
+    const isEdit = !!event;
+    const isLivestockEvent = isEdit && LIVESTOCK_EVENT_TYPES.includes(event?.eventType);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
     const [formData, setFormData] = useState<AgendaCreateRequest>({
         title: "",
@@ -32,11 +37,21 @@ export const EventModal = ({ event, initialDate, onClose }: EventModalProps) => 
 
     useEffect(() => {
         if (event) {
+            const start = new Date(event.startDate);
+            const end = new Date(event.endDate);
+            const formatLocal = (date: Date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            };
             setFormData({
                 title: event.title,
                 description: event.description || "",
-                startDate: new Date(event.startDate).toISOString().slice(0, 16),
-                endDate: new Date(event.endDate).toISOString().slice(0, 16),
+                startDate: formatLocal(start),
+                endDate: formatLocal(end),
                 eventType: event.eventType,
                 fieldId: event.fieldId || null
             });
@@ -51,12 +66,24 @@ export const EventModal = ({ event, initialDate, onClose }: EventModalProps) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate that start date is before end date
+        const startDate = new Date(formData.startDate);
+        const endDate = new Date(formData.endDate);
+
+        if (startDate >= endDate) {
+            toast.error("La fecha de inicio debe ser anterior a la fecha de fin");
+            return;
+        }
+
         try {
-            // Append seconds to dates for backend LocalDateTime compatibility
-            const payload = {
-                ...formData,
-                startDate: formData.startDate.length === 16 ? `${formData.startDate}:00` : formData.startDate,
-                endDate: formData.endDate.length === 16 ? `${formData.endDate}:00` : formData.endDate,
+            const payload: AgendaCreateRequest = {
+                title: formData.title,
+                description: formData.description || undefined,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                eventType: formData.eventType as any,
+                fieldId: formData.fieldId || undefined,
             };
 
             if (isEdit) {
@@ -97,137 +124,277 @@ export const EventModal = ({ event, initialDate, onClose }: EventModalProps) => 
                     backgroundColor: '#1e293b', padding: '2rem', borderRadius: '1rem', width: '90%', maxWidth: '500px',
                     border: '1px solid #334155', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
                 }}>
-                    <h2 style={{ color: '#f8fafc', marginBottom: '1.5rem', fontSize: '1.5rem' }}>
-                        {isEdit ? "Editar Evento" : "Nuevo Evento"}
-                    </h2>
-
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div>
-                            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Título</label>
-                            <input
-                                required
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
-                                placeholder="Ej. Vacunación Aftosa"
-                            />
-                        </div>
-
-                        <div>
-                            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tipo de Evento</label>
-                            <select
-                                value={formData.eventType}
-                                onChange={(e) => setFormData({ ...formData, eventType: e.target.value as any })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
-                            >
-                                {Object.entries(EVENT_LABELS).map(([key, label]) => (
-                                    <option key={key} value={key}>{label}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Inicio</label>
-                                <input
-                                    type="datetime-local"
-                                    required
-                                    value={formData.startDate}
-                                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
-                                />
+                    {isLivestockEvent ? (
+                        <>
+                            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                                <h2 style={{ color: '#f8fafc', marginBottom: '1rem', fontSize: '1.5rem' }}>
+                                    {formData.title}
+                                </h2>
+                                <div style={{
+                                    backgroundColor: '#0f172a',
+                                    padding: '1rem',
+                                    borderRadius: '0.75rem',
+                                    border: '1px solid #334155',
+                                    marginBottom: '1rem'
+                                }}>
+                                    <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                                        🐄 <strong style={{ color: '#fbbf24' }}>Evento de Ganadería</strong>
+                                    </p>
+                                    <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                        Este evento está vinculado a un movimiento de ganadería.
+                                        Para editarlo, debe hacerlo desde el <strong>Historial de Movimientos</strong>.
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Fin</label>
-                                <input
-                                    type="datetime-local"
-                                    required
-                                    value={formData.endDate}
-                                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
-                                />
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', color: '#64748b', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Tipo</label>
+                                    <div style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>
+                                        {EVENT_LABELS[formData.eventType] || formData.eventType}
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: '#64748b', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Inicio</label>
+                                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
+                                            {new Date(formData.startDate).toLocaleString('es-AR', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', color: '#64748b', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Fin</label>
+                                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
+                                            {new Date(formData.endDate).toLocaleString('es-AR', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {formData.fieldId && (
+                                    <div>
+                                        <label style={{ display: 'block', color: '#64748b', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Campo</label>
+                                        <div style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>
+                                            {fields?.find(f => f.id === formData.fieldId)?.name || 'Desconocido'}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {formData.description && (
+                                    <div>
+                                        <label style={{ display: 'block', color: '#64748b', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Descripción</label>
+                                        <div style={{
+                                            color: '#cbd5e1',
+                                            fontSize: '0.9rem',
+                                            whiteSpace: 'pre-wrap',
+                                            backgroundColor: '#0f172a',
+                                            padding: '0.75rem',
+                                            borderRadius: '0.5rem',
+                                            border: '1px solid #334155'
+                                        }}>
+                                            {formData.description}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </div>
 
-                        <div>
-                            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Campo (Opcional)</label>
-                            <select
-                                value={formData.fieldId || ""}
-                                onChange={(e) => setFormData({ ...formData, fieldId: e.target.value ? Number(e.target.value) : null })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
-                            >
-                                <option value="">-- Ninguno / General --</option>
-                                {fields?.map(f => (
-                                    <option key={f.id} value={f.id}>{f.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Descripción</label>
-                            <textarea
-                                value={formData.description || ""}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white', minHeight: '80px' }}
-                                placeholder="Notas adicionales..."
-                            />
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            {isEdit && (
+                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                                 <button
                                     type="button"
-                                    onClick={handleDeleteClick}
+                                    onClick={onClose}
                                     style={{
                                         padding: '0.75rem 1.5rem',
                                         borderRadius: '0.5rem',
                                         backgroundColor: 'transparent',
-                                        border: '1px solid #ef4444',
-                                        color: '#ef4444',
+                                        border: '1px solid #475569',
+                                        color: '#cbd5e1',
                                         cursor: 'pointer',
                                         fontWeight: 500,
                                         transition: 'all 0.2s'
                                     }}
                                 >
-                                    Eliminar
+                                    Cerrar
                                 </button>
-                            )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onClose();
+                                        // Note: Esta funcionalidad requeriría pasar el ID de transacción o navegar al historial
+                                        // Por ahora, el usuario debe buscar manualmente el movimiento en el historial
+                                        toast.info("Por favor, busque este movimiento en el Historial de Movimientos dentro del campo correspondiente");
+                                    }}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        borderRadius: '0.5rem',
+                                        backgroundColor: '#3b82f6',
+                                        border: 'none',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    Ir al Historial
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        /* NORMAL EDIT FORM FOR NON-LIVESTOCK EVENTS */
+                        <>
+                            <h2 style={{ color: '#f8fafc', marginBottom: '1.5rem', fontSize: '1.5rem' }}>
+                                {isEdit ? "Editar Evento" : "Nuevo Evento"}
+                            </h2>
 
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                style={{
-                                    padding: '0.75rem 1.5rem',
-                                    borderRadius: '0.5rem',
-                                    backgroundColor: 'transparent',
-                                    border: '1px solid #475569',
-                                    color: '#cbd5e1',
-                                    cursor: 'pointer',
-                                    fontWeight: 500,
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isCreating || isUpdating}
-                                style={{
-                                    padding: '0.75rem 1.5rem',
-                                    borderRadius: '0.5rem',
-                                    backgroundColor: '#3b82f6',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    opacity: (isCreating || isUpdating) ? 0.7 : 1,
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {isCreating || isUpdating ? "Guardando..." : "Guardar"}
-                            </button>
-                        </div>
-                    </form>
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Título</label>
+                                    <input
+                                        required
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
+                                        placeholder="Ej. Vacunación Aftosa"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tipo de Evento</label>
+                                    <select
+                                        value={formData.eventType}
+                                        onChange={(e) => setFormData({ ...formData, eventType: e.target.value as any })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
+                                    >
+                                        {Object.entries(EVENT_LABELS)
+                                            .filter(([key]) => {
+                                                // Exclude livestock event types - they should only be created from "Registrar Movimiento"
+                                                const livestockTypes = ['PURCHASE', 'SALE', 'LIVESTOCK_BIRTH', 'LIVESTOCK_MOVE', 'HEALTH'];
+                                                return !livestockTypes.includes(key);
+                                            })
+                                            .map(([key, label]) => (
+                                                <option key={key} value={key}>{label}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <small style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.5rem', display: 'block' }}>
+                                        💡 Los movimientos de ganadería se registran desde "Registrar Movimiento"
+                                    </small>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Inicio</label>
+                                        <input
+                                            type="datetime-local"
+                                            required
+                                            value={formData.startDate}
+                                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Fin</label>
+                                        <input
+                                            type="datetime-local"
+                                            required
+                                            value={formData.endDate}
+                                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Campo (Opcional)</label>
+                                    <select
+                                        value={formData.fieldId || ""}
+                                        onChange={(e) => setFormData({ ...formData, fieldId: e.target.value ? Number(e.target.value) : null })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white' }}
+                                    >
+                                        <option value="">-- Ninguno / General --</option>
+                                        {fields?.map(f => (
+                                            <option key={f.id} value={f.id}>{f.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Descripción</label>
+                                    <textarea
+                                        value={formData.description || ""}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: 'white', minHeight: '80px' }}
+                                        placeholder="Notas adicionales..."
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    {isEdit && (
+                                        <button
+                                            type="button"
+                                            onClick={handleDeleteClick}
+                                            style={{
+                                                padding: '0.75rem 1.5rem',
+                                                borderRadius: '0.5rem',
+                                                backgroundColor: 'transparent',
+                                                border: '1px solid #ef4444',
+                                                color: '#ef4444',
+                                                cursor: 'pointer',
+                                                fontWeight: 500,
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        style={{
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '0.5rem',
+                                            backgroundColor: 'transparent',
+                                            border: '1px solid #475569',
+                                            color: '#cbd5e1',
+                                            cursor: 'pointer',
+                                            fontWeight: 500,
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isCreating || isUpdating}
+                                        style={{
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '0.5rem',
+                                            backgroundColor: '#3b82f6',
+                                            border: 'none',
+                                            color: 'white',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            opacity: (isCreating || isUpdating) ? 0.7 : 1,
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {isCreating || isUpdating ? "Guardando..." : "Guardar"}
+                                    </button>
+                                </div>
+                            </form>
+                        </>
+                    )}
                 </div>
             </div>
 

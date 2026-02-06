@@ -1,5 +1,11 @@
 package com.agro.fields.service;
 
+import com.agro.agenda.AgendaEvent;
+import com.agro.agenda.AgendaService;
+import com.agro.agenda.dto.AgendaCreateDTO;
+import com.agro.agenda.dto.AgendaResponseDTO;
+import com.agro.currency.ExchangeRateException;
+import com.agro.currency.ExchangeRateService;
 import com.agro.fields.dto.LivestockTransactionCreateDTO;
 import com.agro.fields.dto.LivestockTransactionResponseDTO;
 import com.agro.fields.model.*;
@@ -11,6 +17,8 @@ import com.agro.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,15 +30,21 @@ public class LivestockTransactionService {
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
     private final LivestockHistoryRepository livestockHistoryRepository;
+    private final ExchangeRateService exchangeRateService;
+    private final AgendaService agendaService;
 
     public LivestockTransactionService(LivestockTransactionRepository transactionRepository,
             FieldRepository fieldRepository,
             UserRepository userRepository,
-            LivestockHistoryRepository livestockHistoryRepository) {
+            LivestockHistoryRepository livestockHistoryRepository,
+            ExchangeRateService exchangeRateService,
+            AgendaService agendaService) {
         this.transactionRepository = transactionRepository;
         this.fieldRepository = fieldRepository;
         this.userRepository = userRepository;
         this.livestockHistoryRepository = livestockHistoryRepository;
+        this.exchangeRateService = exchangeRateService;
+        this.agendaService = agendaService;
     }
 
     @Transactional
@@ -104,7 +118,44 @@ public class LivestockTransactionService {
                 dto.getDate() != null ? dto.getDate() : LocalDate.now(),
                 dto.getNotes());
 
+        // Handle currency conversion for financial tracking
+        if (dto.getPricePerUnit() != null) {
+            transaction.setPricePerUnit(dto.getPricePerUnit());
+            transaction.setCurrency(dto.getCurrency() != null ? dto.getCurrency() : "USD");
+
+            // Convert to USD if currency is ARS
+            if ("ARS".equals(transaction.getCurrency())) {
+                BigDecimal exchangeRate = dto.getExchangeRate();
+                if (exchangeRate == null) {
+                    try {
+                        exchangeRate = exchangeRateService.getCurrentExchangeRate();
+                    } catch (ExchangeRateException e) {
+                        throw new RuntimeException("Failed to get exchange rate. Please provide it manually.", e);
+                    }
+                }
+                transaction.setExchangeRate(exchangeRate);
+                transaction.setPricePerUnitUSD(dto.getPricePerUnit().divide(exchangeRate, 2, RoundingMode.HALF_UP));
+
+                // Convert salvage value if present
+                if (dto.getSalvageValue() != null) {
+                    transaction.setSalvageValue(dto.getSalvageValue());
+                    transaction.setSalvageValueUSD(dto.getSalvageValue().divide(exchangeRate, 2, RoundingMode.HALF_UP));
+                }
+            } else {
+                // USD - no conversion needed
+                transaction.setPricePerUnitUSD(dto.getPricePerUnit());
+                if (dto.getSalvageValue() != null) {
+                    transaction.setSalvageValue(dto.getSalvageValue());
+                    transaction.setSalvageValueUSD(dto.getSalvageValue());
+                }
+            }
+        }
+
         LivestockTransaction saved = transactionRepository.save(transaction);
+
+        // Create corresponding calendar event (non-critical, don't fail if it errors)
+        createCalendarEventAsync(saved, user);
+
         return mapToDTO(saved);
     }
 
@@ -215,7 +266,24 @@ public class LivestockTransactionService {
                 break;
         }
 
-        return mapToDTO(transactionRepository.save(transaction));
+        LivestockTransaction saved = transactionRepository.save(transaction);
+
+        // Update financial fields if present
+        if (dto.getPricePerUnit() != null) {
+            updateFinancialFields(saved, dto);
+            saved = transactionRepository.save(saved);
+        }
+
+        // Update associated agenda event if exists
+        if (saved.getAgendaEventId() != null) {
+            try {
+                updateAgendaEvent(saved);
+            } catch (Exception e) {
+                System.err.println("Failed to update calendar event: " + e.getMessage());
+            }
+        }
+
+        return mapToDTO(saved);
     }
 
     @Transactional
@@ -262,6 +330,16 @@ public class LivestockTransactionService {
                     saveHistory(targetField);
                 }
                 break;
+        }
+
+        // Delete associated calendar event if exists
+        if (transaction.getAgendaEventId() != null) {
+            try {
+                agendaService.deleteEvent(transaction.getAgendaEventId(), userId);
+            } catch (Exception e) {
+                // Log error but continue with transaction deletion
+                System.err.println("Failed to delete calendar event: " + e.getMessage());
+            }
         }
 
         transactionRepository.delete(transaction);
@@ -356,7 +434,7 @@ public class LivestockTransactionService {
     }
 
     private LivestockTransactionResponseDTO mapToDTO(LivestockTransaction t) {
-        return new LivestockTransactionResponseDTO(
+        LivestockTransactionResponseDTO dto = new LivestockTransactionResponseDTO(
                 t.getId(),
                 t.getActionType(),
                 t.getCategory(),
@@ -367,5 +445,175 @@ public class LivestockTransactionService {
                 t.getTargetField() != null ? t.getTargetField().getName() : null,
                 t.getDate(),
                 t.getNotes());
+
+        // Add financial fields
+        dto.setPricePerUnit(t.getPricePerUnit());
+        dto.setCurrency(t.getCurrency());
+        dto.setExchangeRate(t.getExchangeRate());
+        dto.setPricePerUnitUSD(t.getPricePerUnitUSD());
+        dto.setSalvageValue(t.getSalvageValue());
+        dto.setSalvageValueUSD(t.getSalvageValueUSD());
+        dto.setAgendaEventId(t.getAgendaEventId());
+
+        // Calculate total value in USD
+        if (t.getPricePerUnitUSD() != null) {
+            BigDecimal totalValue = t.getPricePerUnitUSD().multiply(new BigDecimal(t.getQuantity()));
+            dto.setTotalValueUSD(totalValue);
+        }
+
+        return dto;
+    }
+
+    /**
+     * Create a calendar event from a livestock transaction
+     */
+    private AgendaResponseDTO createAgendaEventFromTransaction(LivestockTransaction transaction, User user) {
+        String title = buildEventTitle(transaction);
+        String description = buildEventDescription(transaction);
+        AgendaEvent.EventType eventType = mapTransactionToEventType(transaction.getActionType());
+
+        AgendaCreateDTO agendaDto = new AgendaCreateDTO();
+        agendaDto.setTitle(title);
+        agendaDto.setDescription(description);
+        agendaDto.setEventType(eventType);
+        agendaDto.setStartDate(transaction.getDate().atStartOfDay());
+        agendaDto.setEndDate(transaction.getDate().atTime(23, 59));
+
+        // Set field ID based on transaction type
+        Long fieldId = getFieldIdFromTransaction(transaction);
+        agendaDto.setFieldId(fieldId);
+
+        return agendaService.createEvent(user.getId(), agendaDto);
+    }
+
+    private String buildEventTitle(LivestockTransaction t) {
+        return switch (t.getActionType()) {
+            case PURCHASE -> "Compra: " + t.getQuantity() + " " + getCategoryName(t.getCategory());
+            case SALE -> "Venta: " + t.getQuantity() + " " + getCategoryName(t.getCategory());
+            case DEATH -> "Muerte: " + t.getQuantity() + " " + getCategoryName(t.getCategory());
+            case BIRTH -> "Nacimiento: " + t.getQuantity() + " " + getCategoryName(t.getCategory());
+            case MOVE -> "Movimiento: " + t.getQuantity() + " " + getCategoryName(t.getCategory());
+        };
+    }
+
+    private String buildEventDescription(LivestockTransaction t) {
+        StringBuilder desc = new StringBuilder();
+        desc.append("Transacción de ganadería: ").append(t.getActionType()).append("\n");
+        desc.append("Categoría: ").append(getCategoryName(t.getCategory())).append("\n");
+        desc.append("Cantidad: ").append(t.getQuantity()).append("\n");
+
+        if (t.getSourceField() != null) {
+            desc.append("Campo origen: ").append(t.getSourceField().getName()).append("\n");
+        }
+        if (t.getTargetField() != null) {
+            desc.append("Campo destino: ").append(t.getTargetField().getName()).append("\n");
+        }
+        if (t.getPricePerUnitUSD() != null) {
+            desc.append("Precio unitario: USD ").append(t.getPricePerUnitUSD()).append("\n");
+        }
+        if (t.getNotes() != null && !t.getNotes().isEmpty()) {
+            desc.append("Notas: ").append(t.getNotes());
+        }
+
+        return desc.toString();
+    }
+
+    private AgendaEvent.EventType mapTransactionToEventType(LivestockActionType actionType) {
+        return switch (actionType) {
+            case PURCHASE -> AgendaEvent.EventType.PURCHASE;
+            case SALE -> AgendaEvent.EventType.SALE;
+            case DEATH -> AgendaEvent.EventType.HEALTH;
+            case BIRTH -> AgendaEvent.EventType.LIVESTOCK_BIRTH;
+            case MOVE -> AgendaEvent.EventType.LIVESTOCK_MOVE;
+        };
+    }
+
+    private Long getFieldIdFromTransaction(LivestockTransaction transaction) {
+        // Priority: target field for births/purchases, source field otherwise
+        if (transaction.getTargetField() != null) {
+            return transaction.getTargetField().getId();
+        } else if (transaction.getSourceField() != null) {
+            return transaction.getSourceField().getId();
+        }
+        return null;
+    }
+
+    private String getCategoryName(LivestockCategory category) {
+        return switch (category) {
+            case COWS -> "Vacas";
+            case BULLS -> "Toros";
+            case STEERS -> "Novillos";
+            case YOUNG_STEERS -> "Novillitos";
+            case HEIFERS -> "Vaquillonas";
+            case MALE_CALVES -> "Terneros";
+            case FEMALE_CALVES -> "Terneras";
+        };
+    }
+
+    /**
+     * Create calendar event asynchronously to avoid transaction rollback issues
+     */
+    private void createCalendarEventAsync(LivestockTransaction transaction, User user) {
+        try {
+            AgendaResponseDTO agendaResponse = createAgendaEventFromTransaction(transaction, user);
+            if (agendaResponse != null && agendaResponse.getId() != null) {
+                transaction.setAgendaEventId(agendaResponse.getId());
+                transactionRepository.save(transaction);
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the main transaction
+            System.err.println("Failed to create calendar event for transaction " +
+                    transaction.getId() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void updateFinancialFields(LivestockTransaction transaction, LivestockTransactionCreateDTO dto) {
+        transaction.setPricePerUnit(dto.getPricePerUnit());
+        transaction.setCurrency(dto.getCurrency() != null ? dto.getCurrency() : "USD");
+
+        // Convert to USD if currency is ARS
+        if ("ARS".equals(transaction.getCurrency())) {
+            BigDecimal exchangeRate = dto.getExchangeRate();
+            if (exchangeRate == null) {
+                try {
+                    exchangeRate = exchangeRateService.getCurrentExchangeRate();
+                } catch (ExchangeRateException e) {
+                    throw new RuntimeException("Failed to get exchange rate. Please provide it manually.", e);
+                }
+            }
+            transaction.setExchangeRate(exchangeRate);
+            transaction.setPricePerUnitUSD(dto.getPricePerUnit().divide(exchangeRate, 2, RoundingMode.HALF_UP));
+
+            // Convert salvage value if present
+            if (dto.getSalvageValue() != null) {
+                transaction.setSalvageValue(dto.getSalvageValue());
+                transaction.setSalvageValueUSD(dto.getSalvageValue().divide(exchangeRate, 2, RoundingMode.HALF_UP));
+            }
+        } else {
+            // USD - no conversion needed
+            transaction.setPricePerUnitUSD(dto.getPricePerUnit());
+            if (dto.getSalvageValue() != null) {
+                transaction.setSalvageValue(dto.getSalvageValue());
+                transaction.setSalvageValueUSD(dto.getSalvageValue());
+            }
+        }
+    }
+
+    private void updateAgendaEvent(LivestockTransaction transaction) {
+        AgendaEvent.EventType eventType = mapTransactionToEventType(transaction.getActionType());
+        String title = buildEventTitle(transaction);
+        String description = buildEventDescription(transaction);
+
+        AgendaCreateDTO updateDto = new AgendaCreateDTO();
+        updateDto.setTitle(title);
+        updateDto.setDescription(description);
+        updateDto.setStartDate(transaction.getDate().atStartOfDay());
+        updateDto.setEndDate(transaction.getDate().atTime(23, 59));
+        updateDto.setEventType(eventType);
+        updateDto.setFieldId(transaction.getTargetField() != null ? transaction.getTargetField().getId()
+                : (transaction.getSourceField() != null ? transaction.getSourceField().getId() : null));
+
+        agendaService.updateEvent(transaction.getUser().getId(), transaction.getAgendaEventId(), updateDto);
     }
 }
