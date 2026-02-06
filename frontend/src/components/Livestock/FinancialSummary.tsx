@@ -4,11 +4,7 @@ import styles from "@/screens/FieldDetailScreen.module.css";
 import { useLivestockTransactions } from "@/services/LivestockService";
 import { formatCurrency } from "@/services/FinancialService";
 
-interface FinancialSummaryProps {
-    fields: any[];
-}
-
-export const FinancialSummary = ({ fields }: FinancialSummaryProps) => {
+export const FinancialSummary = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const { data: transactions } = useLivestockTransactions();
 
