@@ -10,7 +10,7 @@ interface EventModalProps {
     onClose: () => void;
 }
 
-const LIVESTOCK_EVENT_TYPES = ['PURCHASE', 'SALE', 'LIVESTOCK_BIRTH', 'LIVESTOCK_MOVE', 'HEALTH'];
+const LIVESTOCK_EVENT_TYPES = ['PURCHASE', 'SALE', 'LIVESTOCK_BIRTH', 'LIVESTOCK_MOVE', 'HEALTH', 'LIVESTOCK_EXPENSE'];
 
 import { ConfirmationModal } from "@/components/Common/ConfirmationModal";
 
@@ -138,11 +138,16 @@ export default function EventModal({ event, initialDate, onClose }: EventModalPr
                                     marginBottom: '1rem'
                                 }}>
                                     <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                                        🐄 <strong style={{ color: '#fbbf24' }}>Evento de Ganadería</strong>
+                                        {event?.eventType === 'LIVESTOCK_EXPENSE' ? '💸' : '🐄'}{' '}
+                                        <strong style={{ color: '#fbbf24' }}>
+                                            {event?.eventType === 'LIVESTOCK_EXPENSE' ? 'Gasto de Hacienda' : 'Evento de Ganadería'}
+                                        </strong>
                                     </p>
                                     <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                                        Este evento está vinculado a un movimiento de ganadería.
-                                        Para editarlo, debe hacerlo desde el <strong>Historial de Movimientos</strong>.
+                                        {event?.eventType === 'LIVESTOCK_EXPENSE'
+                                            ? 'Este evento está vinculado a un gasto de hacienda. Para editarlo, debe hacerlo desde el Historial de Gastos.'
+                                            : 'Este evento está vinculado a un movimiento de ganadería. Para editarlo, debe hacerlo desde el Historial de Movimientos.'
+                                        }
                                     </p>
                                 </div>
                             </div>
@@ -230,9 +235,11 @@ export default function EventModal({ event, initialDate, onClose }: EventModalPr
                                     type="button"
                                     onClick={() => {
                                         onClose();
-                                        // Note: Esta funcionalidad requeriría pasar el ID de transacción o navegar al historial
-                                        // Por ahora, el usuario debe buscar manualmente el movimiento en el historial
-                                        toast.info("Por favor, busque este movimiento en el Historial de Movimientos dentro del campo correspondiente");
+                                        if (event?.eventType === 'LIVESTOCK_EXPENSE') {
+                                            toast.info("Por favor, busque este gasto en el Historial de Gastos en la sección de Ganadería General");
+                                        } else {
+                                            toast.info("Por favor, busque este movimiento en el Historial de Movimientos dentro del campo correspondiente");
+                                        }
                                     }}
                                     style={{
                                         padding: '0.75rem 1.5rem',
