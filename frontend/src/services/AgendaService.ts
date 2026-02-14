@@ -19,7 +19,8 @@ export const AgendaEventSchema = z.object({
         "SALE",
         "LIVESTOCK_BIRTH",
         "LIVESTOCK_MOVE",
-        "HEALTH"
+        "HEALTH",
+        "LIVESTOCK_EXPENSE"
     ]),
     fieldId: z.number().nullable().optional(),
 });
@@ -41,7 +42,8 @@ export const AgendaCreateSchema = z.object({
         "SALE",
         "LIVESTOCK_BIRTH",
         "LIVESTOCK_MOVE",
-        "HEALTH"
+        "HEALTH",
+        "LIVESTOCK_EXPENSE"
     ]),
     fieldId: z.number().optional().nullable(),
 });
@@ -60,7 +62,8 @@ export const EVENT_COLORS: Record<string, string> = {
     SALE: "#ef4444",         // Red - Venta
     LIVESTOCK_BIRTH: "#06b6d4", // Cyan - Nacimiento
     LIVESTOCK_MOVE: "#a855f7",  // Purple - Movimiento
-    HEALTH: "#dc2626"        // Dark Red - Salud/Muerte
+    HEALTH: "#dc2626",        // Dark Red - Salud/Muerte
+    LIVESTOCK_EXPENSE: "#f97316" // Orange - Gastos
 };
 
 export const EVENT_LABELS: Record<string, string> = {
@@ -74,7 +77,8 @@ export const EVENT_LABELS: Record<string, string> = {
     SALE: "Venta de Hacienda",
     LIVESTOCK_BIRTH: "Nacimiento",
     LIVESTOCK_MOVE: "Movimiento de Hacienda",
-    HEALTH: "Salud Animal"
+    HEALTH: "Salud Animal",
+    LIVESTOCK_EXPENSE: "Gasto de Hacienda"
 };
 
 export function useAgendaEvents() {

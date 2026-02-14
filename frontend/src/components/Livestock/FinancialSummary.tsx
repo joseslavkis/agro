@@ -2,15 +2,17 @@ import { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import styles from "@/screens/FieldDetailScreen.module.css";
 import { useLivestockTransactions } from "@/services/LivestockService";
+import { useLivestockExpenses } from "@/services/LivestockExpenseService";
 import { formatCurrency } from "@/services/FinancialService";
 
 export const FinancialSummary = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const { data: transactions } = useLivestockTransactions();
+    const { data: livestockExpenses } = useLivestockExpenses();
 
     // Calculate financial summary
     const calculateFinancials = () => {
-        if (!transactions) return { income: 0, expenses: 0, balance: 0, history: [] };
+        if (!transactions && !livestockExpenses) return { income: 0, expenses: 0, balance: 0, history: [] };
 
         let income = 0;
         let expenses = 0;
@@ -18,7 +20,8 @@ export const FinancialSummary = () => {
         // History for chart
         const historyMap = new Map<string, { income: number, expenses: number, balance: number }>();
 
-        transactions
+        // Process livestock transactions
+        (transactions || [])
             .filter((t: any) => t.pricePerUnitUSD && t.totalValueUSD)
             .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
             .forEach((t: any) => {
@@ -53,6 +56,22 @@ export const FinancialSummary = () => {
                         monthData.income += salvage;
                     }
                 }
+            });
+
+        // Process livestock expenses (general hacienda expenses)
+        (livestockExpenses || [])
+            .filter((e: any) => e.costUSD)
+            .forEach((e: any) => {
+                const dateKey = new Date(e.date).toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+
+                if (!historyMap.has(dateKey)) {
+                    historyMap.set(dateKey, { income: 0, expenses: 0, balance: 0 });
+                }
+
+                const monthData = historyMap.get(dateKey)!;
+                const expenseValue = Math.abs(e.costUSD);
+                expenses += expenseValue;
+                monthData.expenses += expenseValue;
             });
 
         // Build history array

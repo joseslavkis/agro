@@ -6,6 +6,8 @@ import { LivestockSummary } from "@/components/Livestock/LivestockSummary";
 import { LivestockActionForm } from "@/components/Livestock/LivestockActionForm";
 import { LivestockHistory } from "@/components/Livestock/LivestockHistory";
 import { FinancialSummary } from "@/components/Livestock/FinancialSummary";
+import { ExpenseForm } from "@/components/Livestock/ExpenseForm";
+import { ExpenseHistory } from "@/components/Livestock/ExpenseHistory";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const LivestockScreen = () => {
@@ -64,15 +66,24 @@ export const LivestockScreen = () => {
                             <FinancialSummary />
                         </div>
 
-                        {/* 3. Action Form */}
+                        {/* 3. Livestock Action Form */}
                         <div style={{ height: '100%' }}>
                             <LivestockActionForm fields={livestockFields} />
                         </div>
+
+                        {/* 4. Expense Form */}
+                        <div style={{ height: '100%' }}>
+                            <ExpenseForm />
+                        </div>
                     </div>
 
-                    {/* 3. History List - Full Width */}
+                    {/* History Lists - Full Width */}
                     <ErrorBoundary>
                         <LivestockHistory />
+                    </ErrorBoundary>
+
+                    <ErrorBoundary>
+                        <ExpenseHistory />
                     </ErrorBoundary>
                 </div>
             </div>
