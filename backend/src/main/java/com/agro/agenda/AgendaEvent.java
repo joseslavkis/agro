@@ -49,7 +49,8 @@ public class AgendaEvent {
         SALE, // Animal sales
         LIVESTOCK_BIRTH, // Animal births
         LIVESTOCK_MOVE, // Movements between fields
-        HEALTH // Health events (including deaths)
+        HEALTH, // Health events (including deaths)
+        LIVESTOCK_EXPENSE // General livestock expenses
     }
 
     public AgendaEvent() {
