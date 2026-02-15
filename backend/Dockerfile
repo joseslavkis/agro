@@ -6,6 +6,7 @@ COPY . .
 RUN mvn package -DskipTests
 
 FROM eclipse-temurin:21-jre AS deploy
+RUN apt-get update && apt-get install -y tesseract-ocr tesseract-ocr-spa && rm -rf /var/lib/apt/lists/*
 WORKDIR /home/app
 COPY --from=build /home/app/target/agro-0.0.1-SNAPSHOT.jar /home/app/agro-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
