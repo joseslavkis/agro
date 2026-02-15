@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import detailStyles from "@/screens/FieldDetailScreen.module.css";
 import { useCreateLivestockExpense } from "@/services/LivestockExpenseService";
 import { useMyFields } from "@/services/FieldServices";
 import { useExchangeRate } from "@/services/FinancialService";
+import { useToken } from "@/services/TokenContext";
+import { scanInvoice } from "@/services/InvoiceScanService";
 
 export const ExpenseForm = () => {
     const { mutateAsync: createExpense, isPending } = useCreateLivestockExpense();
     const { data: fields } = useMyFields();
     const { data: exchangeRateData } = useExchangeRate();
+    const [tokenState] = useToken();
+    const token = tokenState.state === "LOGGED_IN" ? tokenState.accessToken : null;
     const [isOpen, setIsOpen] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [name, setName] = useState("");
     const [fieldId, setFieldId] = useState<string>("");
@@ -18,6 +24,67 @@ export const ExpenseForm = () => {
     const [currency, setCurrency] = useState<'USD' | 'ARS'>('USD');
     const [note, setNote] = useState<string>("");
     const [date, setDate] = useState<string>(new Date().toLocaleDateString('en-CA'));
+    const [scannedPreview, setScannedPreview] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const processFile = async (file: File) => {
+        if (!token) return;
+        if (!file.type.startsWith('image/')) {
+            toast.error("Solo se permiten imágenes");
+            return;
+        }
+
+        setIsScanning(true);
+        try {
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = (ev) => setScannedPreview(ev.target?.result as string);
+            reader.readAsDataURL(file);
+
+            const result = await scanInvoice(file, token);
+
+            // Auto-fill form fields with scanned data
+            if (result.name) setName(result.name);
+            if (result.cost) setCost(result.cost.toString());
+            if (result.currency) setCurrency(result.currency as 'USD' | 'ARS');
+            if (result.date) setDate(result.date);
+            if (result.note) setNote(result.note);
+
+            toast.success("✅ Factura escaneada. Revisá los campos y confirmá.");
+        } catch (error: any) {
+            console.error(error);
+            toast.error("Error al escanear: " + (error.message || "Intentá de nuevo"));
+        } finally {
+            setIsScanning(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const handleScanInvoice = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) processFile(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+
+        const file = e.dataTransfer.files?.[0];
+        if (file) processFile(file);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +110,7 @@ export const ExpenseForm = () => {
             setCurrency('USD');
             setNote("");
             setDate(new Date().toLocaleDateString('en-CA'));
+            setScannedPreview(null);
             setIsOpen(false);
             toast.success("Gasto registrado correctamente");
         } catch (error: any) {
@@ -85,6 +153,117 @@ export const ExpenseForm = () => {
         }}>
             <div className={detailStyles.modalContent} style={{ maxWidth: '500px' }}>
                 <h2 className={detailStyles.h2}>Registrar Gasto de Hacienda</h2>
+
+                {/* AI Scan Section */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleScanInvoice}
+                        style={{ display: 'none' }}
+                    />
+
+                    {/* Scan Button */}
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isScanning}
+                        style={{
+                            background: isScanning
+                                ? 'rgba(139, 92, 246, 0.3)'
+                                : 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                            border: 'none',
+                            color: 'white',
+                            padding: '0.75rem 1.5rem',
+                            borderRadius: '0.75rem',
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            cursor: isScanning ? 'wait' : 'pointer',
+                            transition: 'all 0.3s',
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            marginBottom: '0.75rem'
+                        }}
+                    >
+                        {isScanning ? (
+                            <>
+                                <span style={{
+                                    display: 'inline-block',
+                                    width: '18px',
+                                    height: '18px',
+                                    border: '2px solid rgba(255,255,255,0.3)',
+                                    borderTopColor: 'white',
+                                    borderRadius: '50%',
+                                    animation: 'spin 0.8s linear infinite'
+                                }} />
+                                Escaneando con IA...
+                            </>
+                        ) : (
+                            <>📷 Escanear Factura con IA</>
+                        )}
+                    </button>
+
+                    {/* Drop Zone */}
+                    <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => !isScanning && fileInputRef.current?.click()}
+                        style={{
+                            padding: isDragging ? '2rem 1rem' : '1.25rem 1rem',
+                            borderRadius: '0.75rem',
+                            border: isDragging
+                                ? '2px dashed #8b5cf6'
+                                : '2px dashed rgba(139, 92, 246, 0.35)',
+                            background: isDragging
+                                ? 'rgba(139, 92, 246, 0.15)'
+                                : 'rgba(139, 92, 246, 0.05)',
+                            textAlign: 'center',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            transform: isDragging ? 'scale(1.02)' : 'scale(1)',
+                        }}
+                    >
+                        {isDragging ? (
+                            <>
+                                <div style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>📥</div>
+                                <p style={{ color: '#c4b5fd', fontWeight: 600, margin: 0, fontSize: '0.95rem' }}>
+                                    Soltá la imagen acá
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p style={{ color: '#a78bfa', margin: 0, fontSize: '0.85rem' }}>
+                                    📎 Arrastrá una foto de factura acá o hacé click para seleccionar
+                                </p>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Scanned preview */}
+                {scannedPreview && (
+                    <div style={{
+                        marginBottom: '1rem',
+                        borderRadius: '0.5rem',
+                        overflow: 'hidden',
+                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        maxHeight: '150px'
+                    }}>
+                        <img
+                            src={scannedPreview}
+                            alt="Factura escaneada"
+                            style={{ width: '100%', objectFit: 'cover', maxHeight: '150px' }}
+                        />
+                    </div>
+                )}
+
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.5rem' }}>
 
@@ -189,7 +368,7 @@ export const ExpenseForm = () => {
                         <button
                             type="submit"
                             className={detailStyles.submitButton}
-                            disabled={isPending}
+                            disabled={isPending || isScanning}
                             style={{ flex: 1, marginTop: 0, width: '100%' }}
                         >
                             {isPending ? "Guardando..." : "Registrar Gasto"}
