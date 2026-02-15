@@ -17,6 +17,7 @@ export const ExpenseForm = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
 
     const [name, setName] = useState("");
     const [fieldId, setFieldId] = useState<string>("");
@@ -163,49 +164,87 @@ export const ExpenseForm = () => {
                         onChange={handleScanInvoice}
                         style={{ display: 'none' }}
                     />
+                    <input
+                        ref={cameraInputRef}
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleScanInvoice}
+                        style={{ display: 'none' }}
+                    />
 
-                    {/* Scan Button */}
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isScanning}
-                        style={{
-                            background: isScanning
-                                ? 'rgba(139, 92, 246, 0.3)'
-                                : 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                    {/* Scan Buttons */}
+                    {isScanning ? (
+                        <div style={{
+                            background: 'rgba(139, 92, 246, 0.3)',
                             border: 'none',
                             color: 'white',
                             padding: '0.75rem 1.5rem',
                             borderRadius: '0.75rem',
                             fontSize: '1rem',
                             fontWeight: 600,
-                            cursor: isScanning ? 'wait' : 'pointer',
-                            transition: 'all 0.3s',
                             width: '100%',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '0.5rem',
                             marginBottom: '0.75rem'
-                        }}
-                    >
-                        {isScanning ? (
-                            <>
-                                <span style={{
-                                    display: 'inline-block',
-                                    width: '18px',
-                                    height: '18px',
-                                    border: '2px solid rgba(255,255,255,0.3)',
-                                    borderTopColor: 'white',
-                                    borderRadius: '50%',
-                                    animation: 'spin 0.8s linear infinite'
-                                }} />
-                                Escaneando con IA...
-                            </>
-                        ) : (
-                            <>📷 Escanear Factura con IA</>
-                        )}
-                    </button>
+                        }}>
+                            <span style={{
+                                display: 'inline-block',
+                                width: '18px',
+                                height: '18px',
+                                border: '2px solid rgba(255,255,255,0.3)',
+                                borderTopColor: 'white',
+                                borderRadius: '50%',
+                                animation: 'spin 0.8s linear infinite'
+                            }} />
+                            Escaneando con IA...
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                            <button
+                                type="button"
+                                onClick={() => cameraInputRef.current?.click()}
+                                style={{
+                                    background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                                    border: 'none',
+                                    color: 'white',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '0.75rem',
+                                    fontSize: '0.95rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s',
+                                    flex: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.4rem',
+                                }}
+                            >📷 Cámara</button>
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                style={{
+                                    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                                    border: 'none',
+                                    color: 'white',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '0.75rem',
+                                    fontSize: '0.95rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s',
+                                    flex: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.4rem',
+                                }}
+                            >🖼️ Galería</button>
+                        </div>
+                    )}
 
                     {/* Drop Zone */}
                     <div
