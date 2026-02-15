@@ -5,6 +5,7 @@ import com.agro.agenda.dto.AgendaResponseDTO;
 import com.agro.user.User;
 import com.agro.user.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class AgendaService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AgendaResponseDTO createEvent(Long userId, AgendaCreateDTO createDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -45,7 +46,7 @@ public class AgendaService {
         return mapToDTO(agendaRepository.save(event));
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AgendaResponseDTO updateEvent(Long userId, Long eventId, AgendaCreateDTO updateDTO) {
         AgendaEvent event = agendaRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
@@ -64,7 +65,7 @@ public class AgendaService {
         return mapToDTO(agendaRepository.save(event));
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteEvent(Long userId, Long eventId) {
         AgendaEvent event = agendaRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
