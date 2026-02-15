@@ -11,11 +11,19 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 
 @Service
 public class InvoiceScanService {
@@ -79,10 +87,133 @@ public class InvoiceScanService {
             if (image == null) {
                 throw new RuntimeException("No se pudo leer la imagen. Formato no soportado.");
             }
+
+            // Fix EXIF orientation (mobile phones rotate via metadata, not pixels)
+            image = fixExifOrientation(imageBytes, image);
+
             return tesseract.doOCR(image);
         } catch (TesseractException e) {
             throw new RuntimeException("Error en OCR: " + e.getMessage(), e);
         }
+    }
+
+    private BufferedImage fixExifOrientation(byte[] imageBytes, BufferedImage image) {
+        try {
+            ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes));
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (!readers.hasNext())
+                return image;
+
+            ImageReader reader = readers.next();
+            reader.setInput(iis);
+            IIOMetadata metadata = reader.getImageMetadata(0);
+            if (metadata == null)
+                return image;
+
+            // Look for orientation in EXIF metadata
+            int orientation = getExifOrientation(metadata);
+            reader.dispose();
+            iis.close();
+
+            if (orientation <= 1)
+                return image;
+
+            AffineTransform transform = new AffineTransform();
+            int w = image.getWidth();
+            int h = image.getHeight();
+
+            switch (orientation) {
+                case 2: // Flip horizontal
+                    transform.scale(-1.0, 1.0);
+                    transform.translate(-w, 0);
+                    break;
+                case 3: // Rotate 180
+                    transform.translate(w, h);
+                    transform.rotate(Math.PI);
+                    break;
+                case 4: // Flip vertical
+                    transform.scale(1.0, -1.0);
+                    transform.translate(0, -h);
+                    break;
+                case 5: // Transpose
+                    transform.rotate(Math.PI / 2);
+                    transform.scale(1.0, -1.0);
+                    break;
+                case 6: // Rotate 90 CW
+                    transform.translate(h, 0);
+                    transform.rotate(Math.PI / 2);
+                    break;
+                case 7: // Transverse
+                    transform.scale(-1.0, 1.0);
+                    transform.translate(-h, 0);
+                    transform.translate(0, w);
+                    transform.rotate(3 * Math.PI / 2);
+                    break;
+                case 8: // Rotate 90 CCW
+                    transform.translate(0, w);
+                    transform.rotate(3 * Math.PI / 2);
+                    break;
+                default:
+                    return image;
+            }
+
+            boolean swap = orientation >= 5;
+            int newW = swap ? h : w;
+            int newH = swap ? w : h;
+
+            BufferedImage rotated = new BufferedImage(newW, newH,
+                    image.getType() != 0 ? image.getType() : BufferedImage.TYPE_INT_RGB);
+            AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
+            op.filter(image, rotated);
+            return rotated;
+        } catch (Exception e) {
+            System.err.println("Could not fix EXIF orientation: " + e.getMessage());
+            return image; // Return original if EXIF handling fails
+        }
+    }
+
+    private int getExifOrientation(IIOMetadata metadata) {
+        try {
+            String[] formatNames = metadata.getMetadataFormatNames();
+            for (String formatName : formatNames) {
+                Node root = metadata.getAsTree(formatName);
+                int orientation = findOrientationInNode(root);
+                if (orientation > 0)
+                    return orientation;
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return 1;
+    }
+
+    private int findOrientationInNode(Node node) {
+        // Check if this node contains orientation info
+        NamedNodeMap attrs = node.getAttributes();
+        if (attrs != null) {
+            Node tagNumber = attrs.getNamedItem("number");
+            if (tagNumber != null && "274".equals(tagNumber.getNodeValue())) {
+                // Tag 274 = Orientation in EXIF
+                Node value = attrs.getNamedItem("value");
+                if (value != null) {
+                    try {
+                        return Integer.parseInt(value.getNodeValue());
+                    } catch (NumberFormatException e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
+        // Recurse into children
+        Node child = node.getFirstChild();
+        while (child != null) {
+            int result = findOrientationInNode(child);
+            if (result > 0)
+                return result;
+            child = child.getNextSibling();
+        }
+        return 0;
     }
 
     private InvoiceScanResponseDTO interpretTextWithAI(String ocrText) throws Exception {
