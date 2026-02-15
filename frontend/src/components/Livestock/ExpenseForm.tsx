@@ -160,7 +160,6 @@ export const ExpenseForm = () => {
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
-                        capture="environment"
                         onChange={handleScanInvoice}
                         style={{ display: 'none' }}
                     />
