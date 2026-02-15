@@ -24,6 +24,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/${DB_NAME}"
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      GROQ_API_KEY: "${GROQ_API_KEY}"
     ports:
       - "${BACKEND_EXTERNAL_PORT}:8080"
 
