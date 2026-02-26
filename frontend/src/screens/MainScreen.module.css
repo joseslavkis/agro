@@ -1,101 +1,147 @@
+/* ===== CONTAINER ===== */
 .container {
-    padding: 2rem;
-    max-width: 1200px;
+    padding: 2.5rem 2rem;
+    max-width: 1300px;
     margin: 0 auto;
     width: 100%;
     min-height: 80vh;
 }
 
+/* ===== HEADER ===== */
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 3rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 1rem;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 3rem;
-    width: 100%;
-    padding-bottom: 3rem;
-    justify-content: center;
-    /* Center items if they don't fill row */
-}
-
-/* Blue/Cyan Palette updates */
-.title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #e0f2fe 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
-    letter-spacing: -0.5px;
-}
-
-.card {
-    background: rgba(10, 15, 30, 0.75);
-    backdrop-filter: blur(16px);
-    border-radius: 24px;
-    overflow: hidden;
-    height: 420px;
+.headerLeft {
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    /* Blue border hint */
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    gap: 0.25rem;
+}
+
+.title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #f0fdf4;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    margin: 0;
+}
+
+.addButton {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    border: none;
+    padding: 0.85rem 1.8rem;
+    border-radius: 14px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.addButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(22, 163, 74, 0.55);
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+}
+
+/* ===== STATS BAR ===== */
+.statsBar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.statCard {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.2s;
+}
+
+.statCard:hover {
+    border-color: rgba(74, 222, 128, 0.25);
+}
+
+.statLabel {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+
+.statValue {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #f0fdf4;
+    line-height: 1;
+}
+
+.statUnit {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+}
+
+/* ===== GRID ===== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.75rem;
+    width: 100%;
+    padding-bottom: 3rem;
+}
+
+/* ===== FIELD CARD ===== */
+.card {
+    background: rgba(5, 10, 20, 0.6);
+    backdrop-filter: blur(20px);
+    border-radius: 22px;
+    overflow: hidden;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    position: relative;
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
-    border-color: rgba(59, 130, 246, 0.6);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    border-color: rgba(74, 222, 128, 0.2);
 }
 
+/* Full-bleed image with gradient overlay at bottom */
 .cardImageWrapper {
-    height: 60%;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    position: relative;
-}
-
-.cardDeleteButton {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #cbd5e1;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    opacity: 0;
-    transform: translateY(-5px);
-}
-
-.card:hover .cardDeleteButton {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.cardDeleteButton:hover {
-    background: #ef4444;
-    color: white;
-    transform: scale(1.1) !important;
-    border-color: #ef4444;
+    inset: 0;
+    overflow: hidden;
 }
 
 .cardImage {
@@ -103,101 +149,209 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    filter: brightness(0.75);
 }
 
 .card:hover .cardImage {
-    transform: scale(1.1);
+    transform: scale(1.07);
+    filter: brightness(0.85);
 }
 
-.cardContent {
-    height: 40%;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: linear-gradient(to bottom, #0f172a, #0b1120);
-    /* Deep blue-black */
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    position: relative;
+/* Dark gradient overlay from bottom */
+.cardOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(2, 8, 18, 0.97) 0%,
+        rgba(2, 8, 18, 0.6) 40%,
+        rgba(2, 8, 18, 0.1) 70%,
+        transparent 100%
+    );
     z-index: 1;
 }
 
+/* Content sits above overlay */
+.cardContent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
 .cardTitle {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #f8fafc;
-    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+    margin: 0;
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-.cardSubtitle {
+.cardMeta {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    color: #93c5fd;
-    /* Lighter Blue text for better contrast */
-    font-family: monospace;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.65);
     font-weight: 500;
 }
 
-.addButton {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border: none;
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
-    color: white;
+.cardMetaDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    flex-shrink: 0;
+}
+
+.cardTags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    font-size: 0.73rem;
     font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-.addButton:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+.tagAgri {
+    background: rgba(22, 163, 74, 0.25);
+    color: #86efac;
+    border: 1px solid rgba(22, 163, 74, 0.4);
 }
 
-/* Modal */
+.tagLivestock {
+    background: rgba(217, 119, 6, 0.25);
+    color: #fcd34d;
+    border: 1px solid rgba(217, 119, 6, 0.4);
+}
+
+/* Delete button */
+.cardDeleteButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-4px) scale(0.9);
+}
+
+.card:hover .cardDeleteButton {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.cardDeleteButton:hover {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: white;
+    transform: scale(1.1) !important;
+}
+
+/* Delete icon SVG */
+.cardDeleteButton svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ===== EMPTY STATE ===== */
+.emptyState {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    grid-column: 1 / -1;
+    padding: 5rem 2rem;
+    background: rgba(255, 255, 255, 0.015);
+    border-radius: 24px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.emptyState h2 {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.emptyState p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.35);
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ===== LOADING ===== */
+.loadingWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.loadingText {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* ===== MODAL ===== */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.25s ease;
 }
 
 .modalContent {
-    background: #0f172a;
-    /* Dark blue-black */
-    padding: 3rem;
+    background: #09111f;
+    padding: 2.5rem;
     border-radius: 24px;
     width: 90%;
     max-width: 600px;
-    /* Increased max-width */
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.9);
     position: relative;
     overflow-y: auto;
     max-height: 90vh;
-    /* Ensure it doesn't get squashed */
-    margin: 2rem;
 }
 
 .modalContent::before {
@@ -205,129 +359,112 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #16a34a, #4ade80, #16a34a);
+    border-radius: 24px 24px 0 0;
 }
 
 .h2 {
-    font-size: 2rem;
-    color: white;
+    font-size: 1.7rem;
+    color: #f0fdf4;
     margin-bottom: 2rem;
     font-weight: 700;
     text-align: center;
 }
 
 .inputGroup {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.4rem;
 }
 
 .label {
     display: block;
-    margin-bottom: 0.5rem;
-    color: #cbd5e1;
-    font-size: 0.95rem;
-    font-weight: 500;
+    margin-bottom: 0.45rem;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
 }
 
 .input {
     width: 100%;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    /* Dark background */
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.9rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     color: white;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
-    /* Important for padding */
+}
+
+.input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
 }
 
 .input:focus {
     outline: none;
-    border-color: #3b82f6;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    border-color: #16a34a;
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
 
 .modalActions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    width: 100%;
+    gap: 0.75rem;
+    margin-top: 2rem;
 }
 
 .cancelButton {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #cbd5e1;
-    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.9rem;
     border-radius: 12px;
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 600;
     transition: all 0.2s;
-    width: 100%;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 .cancelButton:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: white;
+    border-color: rgba(255, 255, 255, 0.3);
     color: white;
 }
 
 .submitButton {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
     border: none;
     color: white;
-    padding: 1rem;
+    padding: 0.9rem;
     border-radius: 12px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
-    width: 100%;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
 }
 
 .submitButton:hover {
-    background: #2563eb;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.45);
 }
 
 .submitButton:disabled {
-    opacity: 0.7;
+    opacity: 0.55;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.emptyState {
-    text-align: center;
-    color: #aaa;
-    grid-column: 1 / -1;
-    padding: 4rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 20px;
-    border: 2px dashed rgba(255, 255, 255, 0.1);
-}
-
-/* File Upload Styling */
+/* File Upload */
 .fileUploadContainer {
     position: relative;
     width: 100%;
-    margin-bottom: 0.5rem;
 }
 
 .fileDropZone {
@@ -335,55 +472,51 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-    border: 2px dashed rgba(59, 130, 246, 0.4);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.02);
-    transition: all 0.3s ease;
+    padding: 1.75rem;
+    border: 1.5px dashed rgba(22, 163, 74, 0.35);
+    border-radius: 14px;
+    background: rgba(22, 163, 74, 0.03);
+    transition: all 0.2s ease;
     cursor: pointer;
     text-align: center;
-    color: #cbd5e1;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.9rem;
+    gap: 0.25rem;
+    position: relative;
 }
 
 .fileDropZone:hover {
-    background: rgba(59, 130, 246, 0.05);
-    border-color: #3b82f6;
-    transform: translateY(-2px);
-}
-
-.fileDropZone.active {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: #60a5fa;
+    background: rgba(22, 163, 74, 0.07);
+    border-color: rgba(22, 163, 74, 0.6);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .hiddenInput {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     opacity: 0;
     cursor: pointer;
     z-index: 10;
+    width: 100%;
+    height: 100%;
 }
 
 .uploadIcon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    color: #3b82f6;
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+    color: rgba(74, 222, 128, 0.6);
 }
 
 .selectedFile {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: rgba(22, 163, 74, 0.08);
+    border: 1px solid rgba(22, 163, 74, 0.3);
     border-radius: 12px;
-    color: white;
+    color: #86efac;
     font-size: 0.9rem;
-    width: 100%;
     box-sizing: border-box;
 }
 
@@ -391,62 +524,69 @@
     margin-left: auto;
     background: transparent;
     border: none;
-    color: #ff6b6b;
+    color: #f87171;
     cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    font-size: 1.2rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 1.1rem;
     line-height: 1;
-    border-radius: 50%;
-    transition: background 0.2s;
-    width: auto;
-    box-shadow: none;
+    border-radius: 6px;
+    transition: background 0.15s;
 }
 
 .removeFile:hover {
-    background: rgba(255, 107, 107, 0.1);
+    background: rgba(239, 68, 68, 0.12);
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: 1.25rem 1rem;
     }
 
     .header {
         flex-direction: column;
-        gap: 1rem;
         align-items: stretch;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .title {
         font-size: 2rem;
-        text-align: center;
     }
 
     .addButton {
         width: 100%;
+        text-align: center;
         padding: 1rem;
+    }
+
+    .statsBar {
+        flex-wrap: wrap;
+    }
+
+    .statCard {
+        min-width: calc(50% - 0.5rem);
     }
 
     .grid {
         grid-template-columns: 1fr;
-        /* Single column on mobile */
-        gap: 1.5rem;
+        gap: 1.25rem;
     }
 
     .card {
-        height: auto;
-        min-height: 400px;
+        height: 320px;
     }
 
     .modalContent {
         padding: 1.5rem;
-        margin: 1rem;
-        width: 100%;
+        margin: 0.75rem;
     }
 
     .modalActions {
         grid-template-columns: 1fr;
-        /* Stack buttons */
     }
 }

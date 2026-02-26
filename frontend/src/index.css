@@ -18,11 +18,12 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   /* FullCalendar Customization Variables */
-  --fc-border-color: #cbd5e1;
-  /* Slate-300 */
-  --fc-today-bg-color: #f1f5f9;
-  /* Slate-100 */
+  --fc-border-color: rgba(255, 255, 255, 0.08);
+  --fc-today-bg-color: rgba(34, 197, 94, 0.06);
   --fc-event-border-color: transparent;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: transparent;
+  --fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.06);
 }
 
 *,

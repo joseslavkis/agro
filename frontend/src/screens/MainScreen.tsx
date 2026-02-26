@@ -173,11 +173,17 @@ export const MainScreen = () => {
     }
   };
 
+  const totalHectares = fields ? fields.reduce((sum, f) => sum + (f.hectares || 0), 0) : 0;
+  const agriCount = fields ? fields.filter(f => f.hasAgriculture).length : 0;
+  const livestockCount = fields ? fields.filter(f => f.hasLivestock).length : 0;
+
   if (isLoading) {
     return (
       <CommonLayout>
         <div className={styles.container}>
-          <h2 style={{ color: "white" }}>Cargando campos...</h2>
+          <div className={styles.loadingWrapper}>
+            <p className={styles.loadingText}>Cargando campos...</p>
+          </div>
         </div>
       </CommonLayout>
     );
@@ -187,11 +193,36 @@ export const MainScreen = () => {
     <CommonLayout>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Mis Campos</h1>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.title}>Mis Campos</h1>
+            <p className={styles.subtitle}>Gestiona y monitorea tus propiedades agrícolas</p>
+          </div>
           <button className={styles.addButton} onClick={handleOpenModal}>
             + Nuevo Campo
           </button>
         </header>
+
+        {fields && fields.length > 0 && (
+          <div className={styles.statsBar}>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Total campos</span>
+              <span className={styles.statValue}>{fields.length}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Hectáreas totales</span>
+              <span className={styles.statValue}>{totalHectares.toLocaleString('es-AR')}</span>
+              <span className={styles.statUnit}>ha</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Con agricultura</span>
+              <span className={styles.statValue}>{agriCount}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Con ganadería</span>
+              <span className={styles.statValue}>{livestockCount}</span>
+            </div>
+          </div>
+        )}
 
         <div className={styles.grid}>
           {fields && fields.length > 0 ? (
@@ -200,7 +231,6 @@ export const MainScreen = () => {
                 key={field.id}
                 className={styles.card}
                 onClick={() => setLocation(`/fields/${field.id}`)}
-                style={{ cursor: 'pointer' }}
               >
                 <div className={styles.cardImageWrapper}>
                   <img
@@ -209,22 +239,26 @@ export const MainScreen = () => {
                     className={styles.cardImage}
                   />
                 </div>
+                <div className={styles.cardOverlay} />
                 <div className={styles.cardContent}>
                   <h3 className={styles.cardTitle}>{field.name}</h3>
-                  <div className={styles.cardSubtitle}>
-                    <span>🌱</span>
-                    <span>{field.hectares} Hectáreas</span>
+                  <div className={styles.cardMeta}>
+                    <span>{field.hectares.toLocaleString('es-AR')} hectáreas</span>
+                    {(field.hasAgriculture || field.hasLivestock) && (
+                      <span className={styles.cardMetaDot} />
+                    )}
+                    {field.hasAgriculture && <span>Agricultura</span>}
+                    {field.hasAgriculture && field.hasLivestock && (
+                      <span className={styles.cardMetaDot} />
+                    )}
+                    {field.hasLivestock && <span>Ganadería</span>}
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <div className={styles.cardTags}>
                     {field.hasAgriculture && (
-                      <span style={{ fontSize: '0.8rem', background: '#059669', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                        🌾 Agri
-                      </span>
+                      <span className={`${styles.tag} ${styles.tagAgri}`}>Agri</span>
                     )}
                     {field.hasLivestock && (
-                      <span style={{ fontSize: '0.8rem', background: '#d97706', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                        🐄 Gan
-                      </span>
+                      <span className={`${styles.tag} ${styles.tagLivestock}`}>Ganadería</span>
                     )}
                   </div>
                 </div>
@@ -232,15 +266,16 @@ export const MainScreen = () => {
                   className={styles.cardDeleteButton}
                   onClick={(e) => handleDeleteClick(e, field.id)}
                   title="Eliminar campo"
+                  aria-label="Eliminar campo"
                 >
-                  🗑️
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 </button>
               </div>
             ))
           ) : (
             <div className={styles.emptyState}>
               <h2>No tienes campos aún</h2>
-              <p>Crea tu primer campo para comenzar a gestionar tu producción.</p>
+              <p>Crea tu primer campo para comenzar a gestionar tu producción agrícola.</p>
             </div>
           )}
         </div>
@@ -421,7 +456,6 @@ export const MainScreen = () => {
           deleteConfirmationId !== null && (
             <div className={styles.modalOverlay}>
               <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
                 <h2 className={styles.h2} style={{ marginBottom: '1rem' }}>¿Eliminar campo?</h2>
                 <p style={{ color: '#cbd5e1', marginBottom: '2rem' }}>
                   ¿Estás seguro de que deseas eliminar este campo? Esta acción no se puede deshacer.
