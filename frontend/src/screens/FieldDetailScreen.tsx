@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useField, useUpdateField } from "@/services/FieldServices";
-import { fetchWeather, getWeatherDescription, WeatherData } from "@/services/WeatherService";
+import { fetchWeather, getWeatherDescription, getWeatherEmoji, WeatherData } from "@/services/WeatherService";
 import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
 import styles from "./FieldDetailScreen.module.css";
 import { Link } from "wouter";
@@ -262,7 +262,7 @@ export const FieldDetailScreen = ({ id }: FieldDetailScreenProps) => {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <span style={{ fontSize: '3rem' }}>
-                                            {getWeatherDescription(weather.current.weather_code).icon}
+                                            {getWeatherEmoji(weather.current.weather_code)}
                                         </span>
                                         <div>
                                             <div className={styles.statValue}>
