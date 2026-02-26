@@ -9,6 +9,8 @@ import { useToken } from "@/services/TokenContext";
 import { PartnersScreen } from "@/screens/PartnersScreen";
 import { FieldDetailScreen } from "@/screens/FieldDetailScreen";
 import { WeatherDashboardScreen } from "@/screens/WeatherDashboardScreen";
+import { RainfallFormScreen } from "@/screens/RainfallFormScreen";
+import { RainfallChartScreen } from "@/screens/RainfallChartScreen";
 
 import { LivestockScreen } from "@/screens/LivestockScreen";
 import { FieldLivestockScreen } from "@/screens/FieldLivestockScreen";
@@ -34,6 +36,12 @@ export const Navigation = () => {
           </Route>
           <Route path="/fields/:id/weather">
             {(params) => <WeatherDashboardScreen id={Number(params.id)} />}
+          </Route>
+          <Route path="/fields/:id/rainfall/new">
+            {(params) => <RainfallFormScreen id={Number(params.id)} />}
+          </Route>
+          <Route path="/fields/:id/rainfall/chart">
+            {(params) => <RainfallChartScreen id={Number(params.id)} />}
           </Route>
           <Route path="/fields/:id/livestock">
             {(params) => <FieldLivestockScreen id={Number(params.id)} />}

@@ -62,6 +62,18 @@ export const WeatherDashboardScreen = ({ id }: WeatherDashboardScreenProps) => {
                         </Link>
                         <h1 className={styles.title}>Clima en {field.name}</h1>
                     </div>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <Link href={`/fields/${id}/rainfall/new`}>
+                            <a className={styles.backButton} style={{ background: 'rgba(96,165,250,0.15)', borderColor: 'rgba(96,165,250,0.4)' }}>
+                                🌧️ Cargar Lluvia
+                            </a>
+                        </Link>
+                        <Link href={`/fields/${id}/rainfall/chart`}>
+                            <a className={styles.backButton} style={{ background: 'rgba(96,165,250,0.15)', borderColor: 'rgba(96,165,250,0.4)' }}>
+                                📊 Historial de Lluvias
+                            </a>
+                        </Link>
+                    </div>
                 </header>
 
                 {weatherLoading ? (

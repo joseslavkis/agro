@@ -1,0 +1,318 @@
+.container {
+    padding: 2rem;
+    min-height: 100vh;
+    color: white;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #bfdbfe 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.backButton {
+    padding: 0.6rem 1.2rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    color: #93c5fd;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.backButton:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateX(-3px);
+    color: white;
+}
+
+/* Form */
+.formCard {
+    background: rgba(10, 15, 30, 0.75);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    margin-bottom: 2rem;
+}
+
+.formTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 160px;
+}
+
+.label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.input {
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: #3b82f6;
+}
+
+.submitButton {
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.submitButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+.submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Records List */
+.listCard {
+    background: rgba(10, 15, 30, 0.75);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.listTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.recordItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s;
+}
+
+.recordItem:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.recordDate {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.recordAmount {
+    font-weight: 700;
+    color: #60a5fa;
+    font-size: 1.1rem;
+}
+
+.deleteButton {
+    padding: 0.4rem 0.8rem;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #fca5a5;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.deleteButton:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: white;
+}
+
+.emptyState {
+    text-align: center;
+    color: #64748b;
+    padding: 2rem;
+    font-size: 1rem;
+}
+
+.successMessage {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    color: #6ee7b7;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+}
+
+.errorMessage {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    color: #fca5a5;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+
+    .header {
+        margin-bottom: 1.2rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .backButton {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .formCard {
+        padding: 1.2rem;
+        border-radius: 14px;
+        margin-bottom: 1.2rem;
+    }
+
+    .formTitle {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .inputGroup {
+        min-width: 100%;
+    }
+
+    .input {
+        padding: 0.65rem 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .submitButton {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .listCard {
+        padding: 1.2rem;
+        border-radius: 14px;
+    }
+
+    .listTitle {
+        font-size: 1.1rem;
+    }
+
+    .recordItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.8rem;
+    }
+
+    .recordDate {
+        font-size: 0.9rem;
+    }
+
+    .recordAmount {
+        font-size: 1rem;
+    }
+
+    .deleteButton {
+        align-self: flex-end;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .successMessage,
+    .errorMessage {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .emptyState {
+        padding: 1.5rem;
+        font-size: 0.9rem;
+    }
+}
