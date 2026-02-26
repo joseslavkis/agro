@@ -1,174 +1,565 @@
-.container {
-    padding: 2rem;
+/* ─── Page: full-screen dark background ─── */
+.page {
     min-height: 100vh;
-    color: white;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-.header {
-    margin-bottom: 2rem;
+    background: linear-gradient(145deg, #0a0e1a 0%, #101829 40%, #0c1220 100%);
+    color: #e2e8f0;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ─── Top Nav ─── */
+.topNav {
+    display: flex;
     align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(10, 14, 26, 0.8);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
 
-.title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0;
-    background: linear-gradient(135deg, #e0f2fe 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
-}
-
-.backButton {
-    padding: 0.6rem 1.2rem;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 12px;
-    color: #93c5fd;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    font-weight: 600;
+.backBtn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-.backButton:hover {
-    background: rgba(59, 130, 246, 0.2);
-    transform: translateX(-3px);
-    color: white;
+.backBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.navTitle {
+    flex: 1;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navSpacer {
+    width: 120px;
+    /* balance back button */
+}
+
+/* ─── Dashboard container ─── */
+.dashboard {
+    flex: 1;
+    padding: 1.5rem 2rem 3rem;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    margin-top: 2rem;
 }
 
-.card {
-    background: rgba(10, 15, 30, 0.75);
-    backdrop-filter: blur(16px);
-    border-radius: 20px;
-    padding: 1.5rem;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+/* ─── Loading / Error ─── */
+.loadingWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 60vh;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #60a5fa;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingText {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.errorWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    min-height: 60vh;
+}
+
+.errorTitle {
+    color: #f87171;
+    font-size: 1.5rem;
+}
+
+/* ─── Top Row (hero + stat cards) ─── */
+.topRow {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.heroCard {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.12) 0%, rgba(34, 197, 94, 0.08) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    flex: 2;
+    min-width: 260px;
+}
+
+.heroEmoji {
+    font-size: 4rem;
+    line-height: 1;
+}
+
+.heroInfo {
     display: flex;
     flex-direction: column;
 }
 
-.cardTitle {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: #e2e8f0;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-    padding-bottom: 0.5rem;
+.heroTemp {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #f8fafc;
 }
 
-.currentWeather {
+.heroDeg {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.heroLabel {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+}
+
+.statCard {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    flex: 1;
+    min-width: 150px;
+    transition: background 0.2s;
 }
 
-.temperature {
-    font-size: 4rem;
-    font-weight: 800;
-    color: white;
-    line-height: 1;
+.statCard:hover {
+    background: rgba(255, 255, 255, 0.07);
 }
 
-.weatherLabel {
-    font-size: 1.5rem;
-    color: #93c5fd;
-    margin-top: 0.5rem;
+.statCard>.inlineIcon {
+    width: 28px;
+    height: 28px;
+    color: #60a5fa;
+    flex-shrink: 0;
 }
 
-.statGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.statItem {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
+.statInfo {
+    display: flex;
+    flex-direction: column;
 }
 
 .statValue {
     font-size: 1.25rem;
     font-weight: 700;
-    color: white;
+    color: #f8fafc;
 }
 
 .statLabel {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ─── Summary Grid for Manual Rain ─── */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summaryItem {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.25rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.summaryItem:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+}
+
+.summaryValue {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #60a5fa;
+}
+
+.summaryLabel {
+    font-size: 0.7rem;
     color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-top: 0.25rem;
 }
 
-/* Forecast List */
+
+/* ─── Inline icon helper ─── */
+.inlineIcon {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* ─── Mid Row: Forecast + Detail side-by-side ─── */
+.midRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* ─── Card ─── */
+.card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.cardTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ─── Forecast List ─── */
 .forecastList {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .forecastItem {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    transition: background 0.2s;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: background 0.15s;
 }
 
 .forecastItem:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .forecastDay {
+    flex: 1;
     font-weight: 600;
-    color: #e2e8f0;
-    width: 100px;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    text-transform: capitalize;
 }
 
-.forecastIcon {
-    font-size: 2rem;
+.forecastEmoji {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
 }
 
 .forecastTemps {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
+    width: 90px;
+    justify-content: center;
 }
 
 .maxTemp {
-    color: white;
     font-weight: 700;
+    color: #f8fafc;
 }
 
 .minTemp {
-    color: #94a3b8;
+    color: #64748b;
 }
 
 .forecastRain {
-    color: #60a5fa;
-    font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 0.25rem;
     width: 80px;
     justify-content: flex-end;
+    color: #60a5fa;
+    font-size: 0.85rem;
+}
+
+.forecastRain .inlineIcon {
+    width: 14px;
+    height: 14px;
+    color: #60a5fa;
+}
+
+/* ─── Detail Scroll (wind/rain chips) ─── */
+.detailScroll {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.detailChip {
+    min-width: 120px;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.detailDay {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.detailRow {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.detailRow .inlineIcon {
+    width: 14px;
+    height: 14px;
+    color: #94a3b8;
+}
+
+.detailRain {
+    color: #60a5fa;
+}
+
+.detailRain .inlineIcon {
+    color: #60a5fa;
+}
+
+/* ─── Chart Section ─── */
+.chartSection {
+    width: 100%;
+}
+
+.chartHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.chartWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.chartPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 200px;
+    color: #64748b;
+}
+
+.rainBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    color: #60a5fa;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.rainBtn:hover:not(:disabled) {
+    background: rgba(96, 165, 250, 0.22);
+    border-color: rgba(96, 165, 250, 0.4);
+    color: #93bbfc;
+}
+
+.rainBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Empty State ─── */
+.emptyState {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 50vh;
+    color: #64748b;
+}
+
+.emptyState h2 {
+    font-size: 1.5rem;
+    color: #cbd5e1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+    .midRow {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .topNav {
+        padding: 0.75rem 1rem;
+    }
+
+    .navTitle {
+        font-size: 0.95rem;
+    }
+
+    .navSpacer {
+        display: none;
+    }
+
+    .dashboard {
+        padding: 1rem;
+    }
+
+    .topRow {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .heroCard {
+        grid-column: 1 / -1;
+        min-width: unset;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .heroTemp {
+        font-size: 2.25rem;
+    }
+
+    .heroEmoji {
+        font-size: 2.5rem;
+    }
+
+    .statCard {
+        min-width: unset;
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .statValue {
+        font-size: 1.1rem;
+    }
+
+    .statLabel {
+        font-size: 0.7rem;
+    }
+
+
+    .forecastTemps {
+        width: 70px;
+        gap: 0.5rem;
+    }
+
+    .forecastRain {
+        width: 60px;
+    }
+
+    .forecastDay {
+        font-size: 0.8rem;
+    }
+
+    .detailScroll {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .detailChip {
+        min-width: 110px;
+        flex: none;
+    }
+
+    .chartHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

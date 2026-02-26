@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { useRainfallRecords, useCreateRainfall, useDeleteRainfall } from "@/services/RainfallService";
-import { CommonLayout } from "@/components/CommonLayout/CommonLayout";
 import styles from "./RainfallFormScreen.module.css";
 import { Link } from "wouter";
+
+const IconPlus = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+        <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
+
+const IconArrowLeft = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+        <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+    </svg>
+);
 
 interface RainfallFormScreenProps {
     id: number;
@@ -60,12 +71,12 @@ export const RainfallFormScreen = ({ id }: RainfallFormScreenProps) => {
     };
 
     return (
-        <CommonLayout showVideo={false} contentStyle={{ maxWidth: "100%" }}>
+        <div className={styles.page}>
             <div className={styles.container}>
                 <header className={styles.header}>
                     <Link href={`/fields/${id}/weather`}>
-                        <a className={styles.backButton} style={{ marginBottom: "1rem" }}>
-                            ← Volver al Clima
+                        <a className={styles.backButton} style={{ marginBottom: "1.5rem" }}>
+                            <IconArrowLeft /> Volver al Clima
                         </a>
                     </Link>
                     <h1 className={styles.title}>🌧️ Cargar Lluvia</h1>
@@ -111,7 +122,7 @@ export const RainfallFormScreen = ({ id }: RainfallFormScreenProps) => {
                             className={styles.submitButton}
                             disabled={isCreating}
                         >
-                            {isCreating ? "Guardando..." : "Guardar"}
+                            {isCreating ? "Guardando..." : <><IconPlus /> Guardar</>}
                         </button>
                     </form>
                 </div>
@@ -120,32 +131,36 @@ export const RainfallFormScreen = ({ id }: RainfallFormScreenProps) => {
                 <div className={styles.listCard}>
                     <h3 className={styles.listTitle}>Registros cargados</h3>
 
-                    {isLoading ? (
-                        <div className={styles.emptyState}>Cargando registros...</div>
-                    ) : records && records.length > 0 ? (
-                        records.map((record) => (
-                            <div key={record.id} className={styles.recordItem}>
-                                <span className={styles.recordDate}>
-                                    📅 {formatDate(record.date)}
-                                </span>
-                                <span className={styles.recordAmount}>
-                                    💧 {record.amountMm} mm
-                                </span>
-                                <button
-                                    className={styles.deleteButton}
-                                    onClick={() => handleDelete(record.id)}
-                                >
-                                    Eliminar
-                                </button>
+                    <div className={styles.listContainer}>
+                        {isLoading ? (
+                            <div className={styles.emptyState}>Cargando registros...</div>
+                        ) : records && records.length > 0 ? (
+                            records.map((record) => (
+                                <div key={record.id} className={styles.recordItem}>
+                                    <div className={styles.recordInfo}>
+                                        <span className={styles.recordDate}>
+                                            📅 {formatDate(record.date)}
+                                        </span>
+                                        <span className={styles.recordAmount}>
+                                            💧 {record.amountMm} mm
+                                        </span>
+                                    </div>
+                                    <button
+                                        className={styles.deleteButton}
+                                        onClick={() => handleDelete(record.id)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className={styles.emptyState}>
+                                No hay registros de lluvias aún. ¡Cargá el primero!
                             </div>
-                        ))
-                    ) : (
-                        <div className={styles.emptyState}>
-                            No hay registros de lluvias aún. ¡Cargá el primero!
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
-        </CommonLayout>
+        </div>
     );
 };
