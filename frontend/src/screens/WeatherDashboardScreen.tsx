@@ -62,7 +62,7 @@ export const WeatherDashboardScreen = ({ id }: WeatherDashboardScreenProps) => {
                         </Link>
                         <h1 className={styles.title}>Clima en {field.name}</h1>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div className={styles.headerActions}>
                         <Link href={`/fields/${id}/rainfall/new`}>
                             <a className={styles.backButton} style={{ background: 'rgba(96,165,250,0.15)', borderColor: 'rgba(96,165,250,0.4)' }}>
                                 🌧️ Cargar Lluvia
@@ -77,13 +77,13 @@ export const WeatherDashboardScreen = ({ id }: WeatherDashboardScreenProps) => {
                 </header>
 
                 {weatherLoading ? (
-                    <div style={{ color: '#94a3b8', fontSize: '1.5rem', textAlign: 'center', marginTop: '4rem' }}>
+                    <div className={styles.loadingState}>
                         Cargando pronóstico...
                     </div>
                 ) : weather ? (
                     <div className={styles.grid}>
                         {/* Current Weather Logic */}
-                        <div className={styles.card} style={{ gridColumn: 'span 2' }}>
+                        <div className={`${styles.card} ${styles.cardCurrentWeather}`}>
                             <h3 className={styles.cardTitle}>Ahora</h3>
                             <div className={styles.currentWeather}>
                                 <div style={{ fontSize: '6rem' }}>
@@ -115,7 +115,7 @@ export const WeatherDashboardScreen = ({ id }: WeatherDashboardScreenProps) => {
 
                         {/* Forecast List */}
                         {weather.daily && (
-                            <div className={styles.card} style={{ gridColumn: 'span 1', gridRow: 'span 2' }}>
+                            <div className={`${styles.card} ${styles.cardForecast}`}>
                                 <h3 className={styles.cardTitle}>Pronóstico 7 Días</h3>
                                 <div className={styles.forecastList}>
                                     {weather.daily.time.map((time, index) => {
@@ -144,15 +144,15 @@ export const WeatherDashboardScreen = ({ id }: WeatherDashboardScreenProps) => {
                         )}
 
                         {/* Additional Metrics or Charts could go here */}
-                        <div className={styles.card} style={{ gridColumn: 'span 2' }}>
+                        <div className={`${styles.card} ${styles.cardWindDetail}`}>
                             <h3 className={styles.cardTitle}>Detalle de Viento y Lluvias (Próximos días)</h3>
                             {weather.daily && (
-                                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+                                <div className={styles.windDetailScroll}>
                                     {weather.daily.time.map((time, index) => (
-                                        <div key={`detail-${time}`} style={{ minWidth: '120px', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
-                                            <div style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '0.5rem' }}>{index === 0 ? 'Hoy' : formatDate(time).split(',')[0]}</div>
-                                            <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>💨 Max: {weather.daily?.wind_speed_10m_max[index]} km/h</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#60a5fa' }}>💧 {weather.daily?.precipitation_sum[index]} mm</div>
+                                        <div key={`detail-${time}`} className={styles.windDetailCard}>
+                                            <div className={styles.windDetailDay}>{index === 0 ? 'Hoy' : formatDate(time).split(',')[0]}</div>
+                                            <div className={styles.windDetailWind}>💨 Max: {weather.daily?.wind_speed_10m_max[index]} km/h</div>
+                                            <div className={styles.windDetailRain}>💧 {weather.daily?.precipitation_sum[index]} mm</div>
                                         </div>
                                     ))}
                                 </div>
