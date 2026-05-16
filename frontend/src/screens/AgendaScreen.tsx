@@ -40,13 +40,13 @@ const EVENT_TYPE_ICONS: Record<string, string> = {
   PLANTING: "🌱",
 };
 
-function formatEventDate(dateStr: string) {
-  const date = new Date(dateStr);
+function formatEventDate(dateStr: string | Date) {
+  const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
   return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
 }
 
-function formatEventTime(dateStr: string) {
-  const date = new Date(dateStr);
+function formatEventTime(dateStr: string | Date) {
+  const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
   return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 }
 
